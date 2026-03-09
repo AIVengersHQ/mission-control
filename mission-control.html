@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AIVengers — Mission Control v2.0</title>
+  <title>AIVengers — Mission Control v3.0</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
@@ -17,13 +17,14 @@
       --bg: #0d1117;
       --bg2: #161b22;
       --bg3: #1c2128;
+      --bg4: #21262d;
       --border: rgba(0, 255, 136, 0.15);
+      --border-subtle: rgba(255,255,255,0.06);
       --text: #e6edf3;
       --text-muted: #7d8590;
+      --text-dim: #484f58;
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
     body {
       font-family: 'Inter', sans-serif;
       background: var(--bg);
@@ -31,59 +32,89 @@
       min-height: 100vh;
       overflow-x: hidden;
     }
-
-    /* Animated grid background */
     body::before {
       content: '';
       position: fixed;
       inset: 0;
       background-image:
-        linear-gradient(rgba(0,255,136,0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0,255,136,0.03) 1px, transparent 1px);
-      background-size: 40px 40px;
+        linear-gradient(rgba(0,255,136,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,255,136,0.025) 1px, transparent 1px);
+      background-size: 48px 48px;
       pointer-events: none;
       z-index: 0;
     }
-
-    /* Radial glow at top */
     body::after {
       content: '';
       position: fixed;
-      top: -200px;
+      top: -300px;
       left: 50%;
       transform: translateX(-50%);
-      width: 800px;
-      height: 400px;
-      background: radial-gradient(ellipse, rgba(0,255,136,0.08) 0%, transparent 70%);
+      width: 1000px;
+      height: 500px;
+      background: radial-gradient(ellipse, rgba(0,255,136,0.07) 0%, transparent 70%);
       pointer-events: none;
       z-index: 0;
     }
+    .z1 { position: relative; z-index: 1; }
 
-    .container { position: relative; z-index: 1; }
+    /* ── Scrollbar ─────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg2); }
+    ::-webkit-scrollbar-thumb { background: rgba(0,255,136,0.2); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(0,255,136,0.4); }
 
-    /* Header */
-    .header {
-      background: rgba(22, 27, 34, 0.9);
-      border-bottom: 1px solid var(--border);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-
-    /* Neon text */
+    /* ── Neon ──────────────────────────────────────────── */
+    .neon { color: var(--neon); }
     .neon-text {
       color: var(--neon);
       text-shadow: 0 0 20px rgba(0,255,136,0.5), 0 0 40px rgba(0,255,136,0.2);
     }
+    .neon-border { border-color: rgba(0,255,136,0.4) !important; }
 
-    /* Cards */
+    /* ── Header ────────────────────────────────────────── */
+    .header {
+      background: rgba(13,17,23,0.95);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      position: sticky;
+      top: 0;
+      z-index: 200;
+    }
+
+    /* ── Nav Tabs ──────────────────────────────────────── */
+    .nav-tab {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid transparent;
+      white-space: nowrap;
+      user-select: none;
+    }
+    .nav-tab:hover {
+      color: var(--text);
+      background: var(--bg3);
+    }
+    .nav-tab.active {
+      color: var(--neon);
+      background: rgba(0,255,136,0.08);
+      border-color: rgba(0,255,136,0.2);
+      text-shadow: 0 0 12px rgba(0,255,136,0.3);
+    }
+
+    /* ── Cards ─────────────────────────────────────────── */
     .card {
       background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      transition: all 0.3s ease;
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      transition: all 0.25s ease;
       position: relative;
       overflow: hidden;
     }
@@ -95,14 +126,14 @@
       opacity: 0;
       transition: opacity 0.3s ease;
     }
-    .card:hover {
-      border-color: rgba(0,255,136,0.35);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 32px rgba(0,255,136,0.08);
-    }
+    .card:hover { border-color: rgba(0,255,136,0.25); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
     .card:hover::before { opacity: 1; }
+    .card-inner { position: relative; z-index: 1; }
 
-    /* Agent card accent line */
+    /* ── Agent Cards ───────────────────────────────────── */
+    .agent-card-active {
+      border-color: rgba(0,255,136,0.2) !important;
+    }
     .agent-card-active::after {
       content: '';
       position: absolute;
@@ -111,660 +142,1463 @@
       background: linear-gradient(90deg, transparent, var(--neon), transparent);
     }
 
-    /* Status dot pulse */
+    /* ── Status Dot ────────────────────────────────────── */
     @keyframes pulse-dot {
-      0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 0 0 rgba(0,255,136,0.4); }
-      50% { opacity: 0.9; transform: scale(1.1); box-shadow: 0 0 0 6px rgba(0,255,136,0); }
+      0%, 100% { box-shadow: 0 0 0 0 rgba(0,255,136,0.4); }
+      50% { box-shadow: 0 0 0 5px rgba(0,255,136,0); }
     }
     .status-dot {
-      width: 10px; height: 10px;
+      width: 9px; height: 9px;
       border-radius: 50%;
       background: var(--neon);
       animation: pulse-dot 2s ease-in-out infinite;
-      display: inline-block;
+      flex-shrink: 0;
     }
-    .status-dot-inactive {
-      background: #4a5568;
-      animation: none;
-      box-shadow: none;
-    }
+    .status-dot-idle { background: #f59e0b; animation: none; }
+    .status-dot-offline { background: #4a5568; animation: none; }
 
-    /* Pill badges */
+    /* ── Badges ────────────────────────────────────────── */
     .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 2px 10px;
-      border-radius: 999px;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 9px; border-radius: 999px;
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.8px; text-transform: uppercase;
     }
-    .badge-active {
-      background: rgba(0,255,136,0.12);
-      color: var(--neon);
-      border: 1px solid rgba(0,255,136,0.25);
-    }
-    .badge-soon {
-      background: rgba(125,133,144,0.12);
-      color: var(--text-muted);
-      border: 1px solid rgba(125,133,144,0.2);
-    }
-    .badge-high {
-      background: rgba(239,68,68,0.12);
-      color: #f87171;
-      border: 1px solid rgba(239,68,68,0.2);
-    }
-    .badge-medium {
-      background: rgba(251,146,60,0.12);
-      color: #fb923c;
-      border: 1px solid rgba(251,146,60,0.2);
-    }
-    .badge-low {
-      background: rgba(125,133,144,0.12);
-      color: var(--text-muted);
-      border: 1px solid rgba(125,133,144,0.2);
-    }
+    .badge-active  { background: rgba(0,255,136,0.1);  color: var(--neon);   border: 1px solid rgba(0,255,136,0.25); }
+    .badge-idle    { background: rgba(245,158,11,0.1); color: #fbbf24;       border: 1px solid rgba(245,158,11,0.25); }
+    .badge-soon    { background: rgba(99,102,241,0.1); color: #818cf8;       border: 1px solid rgba(99,102,241,0.25); }
+    .badge-high    { background: rgba(239,68,68,0.1);  color: #f87171;       border: 1px solid rgba(239,68,68,0.25); }
+    .badge-medium  { background: rgba(251,146,60,0.1); color: #fb923c;       border: 1px solid rgba(251,146,60,0.25); }
+    .badge-low     { background: rgba(99,102,241,0.1); color: #818cf8;       border: 1px solid rgba(99,102,241,0.25); }
+    .badge-plan    { background: rgba(0,255,136,0.1);  color: var(--neon);   border: 1px solid rgba(0,255,136,0.25); }
+    .badge-research{ background: rgba(99,102,241,0.1); color: #818cf8;       border: 1px solid rgba(99,102,241,0.25); }
+    .badge-content { background: rgba(244,63,94,0.1);  color: #fb7185;       border: 1px solid rgba(244,63,94,0.25); }
+    .badge-brief   { background: rgba(245,158,11,0.1); color: #fbbf24;       border: 1px solid rgba(245,158,11,0.25); }
+    .badge-active-proj  { background: rgba(0,255,136,0.1); color: var(--neon); border: 1px solid rgba(0,255,136,0.25); }
+    .badge-paused  { background: rgba(245,158,11,0.1); color: #fbbf24;       border: 1px solid rgba(245,158,11,0.25); }
+    .badge-review  { background: rgba(99,102,241,0.1); color: #818cf8;       border: 1px solid rgba(99,102,241,0.25); }
 
-    /* Activity feed */
-    .log-entry {
-      border-left: 2px solid var(--border);
-      padding-left: 16px;
-      position: relative;
-      transition: border-color 0.3s;
-    }
-    .log-entry:hover { border-left-color: var(--neon); }
-    .log-entry::before {
-      content: '';
-      position: absolute;
-      left: -5px; top: 6px;
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      background: var(--bg3);
-      border: 2px solid var(--border);
-      transition: border-color 0.3s, background 0.3s;
-    }
-    .log-entry:hover::before {
-      border-color: var(--neon);
-      background: rgba(0,255,136,0.2);
-    }
-
-    /* Kanban columns */
-    .kanban-col {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      min-height: 200px;
-    }
-    .kanban-col-header {
-      padding: 14px 16px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    /* Todo cards */
-    .todo-card {
-      background: var(--bg3);
-      border: 1px solid rgba(255,255,255,0.05);
-      border-radius: 8px;
-      padding: 12px;
-      margin: 8px;
-      transition: all 0.2s ease;
-      cursor: default;
-    }
-    .todo-card:hover {
-      border-color: rgba(0,255,136,0.2);
-      background: rgba(28,33,40,0.9);
-    }
-
-    /* Stats bar */
-    .stat-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-    }
+    /* ── Stat Bar ──────────────────────────────────────── */
     .stat-value {
-      font-size: 2rem;
-      font-weight: 800;
-      color: var(--neon);
-      line-height: 1;
+      font-size: 2rem; font-weight: 800;
+      color: var(--neon); line-height: 1;
       text-shadow: 0 0 20px rgba(0,255,136,0.4);
     }
     .stat-label {
-      font-size: 11px;
-      font-weight: 500;
+      font-size: 10px; font-weight: 600;
       color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 1px;
+      text-transform: uppercase; letter-spacing: 1.2px;
     }
 
-    /* Divider */
-    .stat-divider {
-      width: 1px;
-      height: 40px;
-      background: var(--border);
+    /* ── Buttons ───────────────────────────────────────── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 16px; border-radius: 8px;
+      font-size: 12px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s;
+      border: 1px solid transparent;
     }
-
-    /* Refresh button */
-    .btn-refresh {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 14px;
-      border-radius: 8px;
-      background: rgba(0,255,136,0.08);
-      border: 1px solid rgba(0,255,136,0.2);
+    .btn-primary {
+      background: var(--neon); color: #0d1117;
+      box-shadow: 0 0 20px rgba(0,255,136,0.3);
+    }
+    .btn-primary:hover { background: #00e07a; box-shadow: 0 0 30px rgba(0,255,136,0.5); }
+    .btn-ghost {
+      background: rgba(0,255,136,0.06);
+      border-color: rgba(0,255,136,0.2);
       color: var(--neon);
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
+    }
+    .btn-ghost:hover { background: rgba(0,255,136,0.12); border-color: rgba(0,255,136,0.4); }
+    .btn-subtle {
+      background: var(--bg3); border-color: var(--border-subtle); color: var(--text-muted);
+    }
+    .btn-subtle:hover { color: var(--text); border-color: rgba(0,255,136,0.2); }
+
+    /* ── Activity feed ─────────────────────────────────── */
+    .log-entry {
+      border-left: 2px solid var(--border-subtle);
+      padding-left: 14px;
+      position: relative;
+    }
+    .log-entry::before {
+      content: '';
+      position: absolute; left: -5px; top: 5px;
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--bg3); border: 2px solid var(--border-subtle);
       transition: all 0.2s;
     }
-    .btn-refresh:hover {
-      background: rgba(0,255,136,0.15);
-      border-color: rgba(0,255,136,0.4);
+    .log-entry:hover { border-left-color: var(--neon); }
+    .log-entry:hover::before { border-color: var(--neon); background: rgba(0,255,136,0.2); }
+
+    /* ── Kanban ────────────────────────────────────────── */
+    .kanban-col {
+      background: var(--bg2);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px; min-height: 200px;
+    }
+    .kanban-col-header {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .todo-card {
+      background: var(--bg3);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px; padding: 12px; margin: 8px;
+      transition: all 0.2s ease; cursor: default;
+    }
+    .todo-card:hover {
+      border-color: rgba(0,255,136,0.2);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
     }
 
-    /* Spinner */
-    @keyframes spin {
-      to { transform: rotate(360deg); }
+    /* ── Progress Bar ──────────────────────────────────── */
+    .progress-track {
+      height: 6px; background: var(--bg4);
+      border-radius: 999px; overflow: hidden;
     }
-    .spinning { animation: spin 1s linear infinite; }
-
-    /* Fade in animation */
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(12px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .fade-in {
-      animation: fadeInUp 0.4s ease forwards;
+    .progress-fill {
+      height: 100%; border-radius: 999px;
+      background: linear-gradient(90deg, var(--neon-dim), var(--neon));
+      box-shadow: 0 0 8px rgba(0,255,136,0.4);
+      transition: width 1s ease;
     }
 
-    /* Section title */
-    .section-title {
+    /* ── Calendar ──────────────────────────────────────── */
+    .cal-cell {
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px; padding: 8px;
+      min-height: 100px; position: relative;
+    }
+    .cal-cell.today { border-color: rgba(0,255,136,0.35); background: rgba(0,255,136,0.03); }
+    .cal-event {
+      background: rgba(0,255,136,0.08);
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 4px;
+      padding: 3px 7px;
       font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 2px;
-      text-transform: uppercase;
+      color: var(--neon);
+      margin-bottom: 3px;
+      cursor: pointer;
+      transition: background 0.2s;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .cal-event:hover { background: rgba(0,255,136,0.15); }
+
+    /* ── Memory / Journal ──────────────────────────────── */
+    .memory-entry {
+      background: var(--bg2);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px; padding: 16px;
+      transition: all 0.2s;
+    }
+    .memory-entry:hover { border-color: rgba(0,255,136,0.2); }
+
+    /* ── Input ─────────────────────────────────────────── */
+    .input {
+      background: var(--bg3);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px; padding: 8px 14px;
+      color: var(--text); font-size: 13px;
+      font-family: 'Inter', sans-serif;
+      outline: none; transition: border-color 0.2s;
+      width: 100%;
+    }
+    .input:focus { border-color: rgba(0,255,136,0.4); }
+    .input::placeholder { color: var(--text-dim); }
+    select.input { cursor: pointer; }
+
+    /* ── Section heading ───────────────────────────────── */
+    .section-label {
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase;
       color: var(--text-muted);
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      display: flex; align-items: center; gap: 8px;
     }
-    .section-title::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--border);
+    .section-label::after {
+      content: ''; flex: 1; height: 1px; background: var(--border-subtle);
     }
 
-    /* Agent emoji */
-    .agent-emoji {
-      font-size: 2rem;
-      line-height: 1;
-      filter: drop-shadow(0 0 8px rgba(0,255,136,0.3));
+    /* ── Office / Pixel Art ────────────────────────────── */
+    .office-room {
+      background: #111827;
+      border: 2px solid rgba(0,255,136,0.12);
+      border-radius: 16px;
+      position: relative;
+      overflow: hidden;
     }
-
-    /* Clock */
-    #clock {
-      font-variant-numeric: tabular-nums;
-      font-weight: 600;
-      color: var(--text-muted);
-      font-size: 13px;
-    }
-
-    /* Scrollbar */
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: var(--bg); }
-    ::-webkit-scrollbar-thumb { background: rgba(0,255,136,0.2); border-radius: 3px; }
-    ::-webkit-scrollbar-thumb:hover { background: rgba(0,255,136,0.4); }
-
-    /* Empty state */
-    .empty-state {
-      padding: 32px;
-      text-align: center;
-      color: var(--text-muted);
-      font-size: 13px;
-    }
-
-    /* Loading skeleton */
-    @keyframes shimmer {
-      0% { background-position: -200% 0; }
-      100% { background-position: 200% 0; }
-    }
-    .skeleton {
-      background: linear-gradient(90deg, var(--bg2) 25%, var(--bg3) 50%, var(--bg2) 75%);
-      background-size: 200% 100%;
-      animation: shimmer 1.5s infinite;
+    .desk {
+      background: #1e2d3d;
+      border: 2px solid #2d4a66;
       border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .desk:hover { border-color: var(--neon); box-shadow: 0 0 16px rgba(0,255,136,0.2); }
+    .desk-label {
+      font-size: 10px; font-weight: 700;
+      text-align: center; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 1px;
+    }
+    @keyframes agent-bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+    .agent-avatar {
+      font-size: 28px; text-align: center;
+      line-height: 1;
+    }
+    .agent-active .agent-avatar {
+      animation: agent-bounce 2s ease-in-out infinite;
+      filter: drop-shadow(0 0 8px rgba(0,255,136,0.5));
+    }
+    .agent-away .agent-avatar { opacity: 0.35; filter: grayscale(1); }
+    @keyframes scanline {
+      0% { transform: translateY(-100%); }
+      100% { transform: translateY(100vh); }
+    }
+    .office-room::after {
+      content: '';
+      position: absolute;
+      left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(transparent, rgba(0,255,136,0.05), transparent);
+      animation: scanline 6s linear infinite;
+      pointer-events: none;
+    }
+    /* Floor tiles */
+    .floor-tile {
+      background:
+        repeating-conic-gradient(#0f1923 0% 25%, #111827 0% 50%) 0 0 / 24px 24px;
     }
 
-    /* Responsive */
-    @media (max-width: 768px) {
-      .kanban-grid { grid-template-columns: 1fr !important; }
-      .agents-grid { grid-template-columns: 1fr 1fr !important; }
-      .stats-bar { flex-wrap: wrap; gap: 16px; }
-      .stat-divider { display: none; }
+    /* ── Chain of command ──────────────────────────────── */
+    .chain-line {
+      width: 2px; background: var(--border);
+      margin: 0 auto;
     }
+
+    /* ── Modal ─────────────────────────────────────────── */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(4px);
+      z-index: 999;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .modal {
+      background: var(--bg2);
+      border: 1px solid rgba(0,255,136,0.25);
+      border-radius: 16px;
+      padding: 28px; width: 100%; max-width: 480px;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.5), 0 0 40px rgba(0,255,136,0.08);
+    }
+
+    /* ── Animations ────────────────────────────────────── */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in { animation: fadeInUp 0.35s ease forwards; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinning { animation: spin 1s linear infinite; }
+    @keyframes glow-pulse {
+      0%,100% { text-shadow: 0 0 20px rgba(0,255,136,0.5), 0 0 40px rgba(0,255,136,0.2); }
+      50% { text-shadow: 0 0 30px rgba(0,255,136,0.7), 0 0 60px rgba(0,255,136,0.3); }
+    }
+    .glow-pulse { animation: glow-pulse 3s ease-in-out infinite; }
+
+    /* ── Responsive nav scroll ─────────────────────────── */
+    .nav-scroll {
+      overflow-x: auto; white-space: nowrap;
+      scrollbar-width: none;
+    }
+    .nav-scroll::-webkit-scrollbar { display: none; }
+
+    /* ── Tab pane ──────────────────────────────────────── */
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; }
+
+    /* ── Toast ─────────────────────────────────────────── */
+    .toast {
+      position: fixed; bottom: 24px; right: 24px;
+      background: var(--bg2);
+      border: 1px solid rgba(0,255,136,0.3);
+      border-radius: 10px;
+      padding: 12px 20px;
+      font-size: 13px; font-weight: 500;
+      color: var(--neon);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      z-index: 9999;
+      animation: fadeInUp 0.3s ease;
+      max-width: 300px;
+    }
+    .toast.error { border-color: rgba(239,68,68,0.3); color: #f87171; }
   </style>
 </head>
 <body>
 
-<!-- ═══════════════════════════════════════════════════════ HEADER -->
+<!-- ═══════════════════════════════════════════════════════════
+     HEADER
+═══════════════════════════════════════════════════════════ -->
 <header class="header">
-  <div style="max-width: 1400px; margin: 0 auto; padding: 0 24px;">
-    <div style="display: flex; align-items: center; justify-content: space-between; height: 64px;">
-
-      <!-- Logo & Title -->
-      <div style="display: flex; align-items: center; gap: 16px;">
-        <div style="position: relative;">
-          <div style="width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg, rgba(0,255,136,0.2), rgba(0,255,136,0.05)); border: 1px solid rgba(0,255,136,0.3); display: flex; align-items: center; justify-content: center; font-size: 20px;">⚡</div>
-          <div style="position: absolute; inset: -2px; border-radius: 12px; border: 1px solid rgba(0,255,136,0.1);"></div>
-        </div>
-        <div>
-          <div style="font-size: 18px; font-weight: 800; letter-spacing: -0.5px; color: #e6edf3;">
-            AI<span class="neon-text">VENGERS</span>
-          </div>
-          <div style="font-size: 10px; color: var(--text-muted); letter-spacing: 1.5px; text-transform: uppercase; margin-top: 1px;">
-            Mission Control v2.0
-          </div>
-        </div>
-      </div>
-
-      <!-- Tagline (hidden on small screens) -->
-      <div style="font-size: 12px; color: var(--text-muted); font-style: italic; letter-spacing: 0.5px; display: none; text-align: center;" class="md-tagline">
-        "One man. The machine. The empire."
-      </div>
-
-      <!-- Right side: clock + status -->
-      <div style="display: flex; align-items: center; gap: 20px;">
-        <div style="text-align: right;">
-          <div id="clock">--:--:-- --</div>
-          <div style="font-size: 10px; color: var(--text-muted); letter-spacing: 1px;">EST / EDT</div>
-        </div>
-        <div style="display: flex; align-items: center; gap: 8px; padding: 6px 14px; background: rgba(0,255,136,0.06); border: 1px solid rgba(0,255,136,0.15); border-radius: 8px;">
-          <span class="status-dot"></span>
-          <span style="font-size: 12px; font-weight: 600; color: var(--neon);">ONLINE</span>
-        </div>
+  <div class="z1 px-4 py-3 flex items-center justify-between gap-4 max-w-screen-2xl mx-auto">
+    <!-- Logo -->
+    <div class="flex items-center gap-3 flex-shrink-0">
+      <div style="width:32px;height:32px;background:var(--neon);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 0 16px rgba(0,255,136,0.4);">⚡</div>
+      <div>
+        <div class="font-black text-sm tracking-wider" style="color:var(--neon);">AIVENGERS</div>
+        <div style="font-size:10px;color:var(--text-dim);letter-spacing:1px;font-weight:600;">MISSION CONTROL v3.0</div>
       </div>
     </div>
 
-    <!-- Tagline for medium+ -->
-    <div style="padding-bottom: 10px; text-align: center; font-size: 12px; color: var(--text-muted); font-style: italic; letter-spacing: 0.5px;">
-      "One man. The machine. The empire."
+    <!-- Nav tabs -->
+    <nav class="nav-scroll flex-1">
+      <div style="display:inline-flex;gap:4px;padding:2px 0;">
+        <button class="nav-tab active" onclick="switchTab('home')">🏠 <span class="hidden sm:inline">Mission Control</span></button>
+        <button class="nav-tab" onclick="switchTab('tasks')">📋 <span class="hidden sm:inline">Tasks</span></button>
+        <button class="nav-tab" onclick="switchTab('calendar')">📅 <span class="hidden sm:inline">Calendar</span></button>
+        <button class="nav-tab" onclick="switchTab('projects')">🎯 <span class="hidden sm:inline">Projects</span></button>
+        <button class="nav-tab" onclick="switchTab('memory')">🧠 <span class="hidden sm:inline">Memory</span></button>
+        <button class="nav-tab" onclick="switchTab('documents')">📄 <span class="hidden sm:inline">Documents</span></button>
+        <button class="nav-tab" onclick="switchTab('team')">👥 <span class="hidden sm:inline">Team</span></button>
+        <button class="nav-tab" onclick="switchTab('office')">🎮 <span class="hidden sm:inline">Office</span></button>
+      </div>
+    </nav>
+
+    <!-- Clock -->
+    <div class="flex-shrink-0 text-right hidden md:block">
+      <div id="clock" class="font-mono font-bold" style="font-size:15px;color:var(--neon);text-shadow:0 0 12px rgba(0,255,136,0.4);">--:--:--</div>
+      <div id="date-str" style="font-size:10px;color:var(--text-dim);font-weight:500;">EST</div>
     </div>
   </div>
 </header>
 
-<!-- ═══════════════════════════════════════════════════════ MAIN -->
-<main class="container" style="max-width: 1400px; margin: 0 auto; padding: 32px 24px;">
+<!-- ═══════════════════════════════════════════════════════════
+     MAIN CONTENT
+═══════════════════════════════════════════════════════════ -->
+<main class="z1 max-w-screen-2xl mx-auto px-4 py-6">
 
-  <!-- ─── QUICK STATS BAR ─── -->
-  <div class="card fade-in" style="padding: 24px 32px; margin-bottom: 32px;">
-    <div class="stats-bar" style="display: flex; align-items: center; justify-content: space-around; gap: 24px;">
-      <div class="stat-item">
-        <div class="stat-value" id="stat-tasks-today">—</div>
-        <div class="stat-label">Tasks Today</div>
-      </div>
-      <div class="stat-divider"></div>
-      <div class="stat-item">
-        <div class="stat-value">2</div>
-        <div class="stat-label">Active Agents</div>
-      </div>
-      <div class="stat-divider"></div>
-      <div class="stat-item">
-        <div class="stat-value" id="stat-in-progress">—</div>
-        <div class="stat-label">In Progress</div>
-      </div>
-      <div class="stat-divider"></div>
-      <div class="stat-item">
-        <div class="stat-value" id="stat-done">—</div>
-        <div class="stat-label">Completed</div>
-      </div>
-      <div class="stat-divider"></div>
-      <div class="stat-item">
-        <div class="stat-value neon-text">3</div>
-        <div class="stat-label">Systems Online</div>
-      </div>
-    </div>
-  </div>
+  <!-- ╔═══════════════════════════════════════════════╗
+       ║  TAB 1 — MISSION CONTROL                      ║
+       ╚═══════════════════════════════════════════════╝ -->
+  <div id="tab-home" class="tab-pane active">
 
-  <!-- ─── AGENT CARDS ─── -->
-  <div class="section-title fade-in">⚡ Agent Roster</div>
-  <div class="agents-grid fade-in" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 40px;">
-
-    <!-- CODY -->
-    <div class="card agent-card-active" style="padding: 24px;">
-      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
-        <div class="agent-emoji">⚡</div>
-        <span class="badge badge-active">● Active</span>
-      </div>
-      <div style="font-size: 18px; font-weight: 700; margin-bottom: 4px;">CODY</div>
-      <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">The Builder</div>
-      <div style="font-size: 11px; color: var(--text-muted); line-height: 1.6;">
-        Codes, builds, deploys. Full-stack agent. No task too big.
-      </div>
+    <!-- Hero -->
+    <div class="mb-8 text-center fade-in">
+      <div class="font-black glow-pulse mb-2" style="font-size:clamp(1.5rem,4vw,2.8rem);color:var(--neon);">⚡ MISSION CONTROL</div>
+      <div style="color:var(--text-muted);font-size:14px;max-width:600px;margin:0 auto;">Build the first billion-dollar business by one man and the machine.</div>
     </div>
 
-    <!-- SAGE -->
-    <div class="card agent-card-active" style="padding: 24px;">
-      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
-        <div class="agent-emoji">🧠</div>
-        <span class="badge badge-active">● Active</span>
-      </div>
-      <div style="font-size: 18px; font-weight: 700; margin-bottom: 4px;">SAGE</div>
-      <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Chief of Staff</div>
-      <div style="font-size: 11px; color: var(--text-muted); line-height: 1.6;">
-        Strategy, coordination, daily briefings. JP's right hand.
-      </div>
-    </div>
-
-    <!-- ORACLE -->
-    <div class="card" style="padding: 24px; opacity: 0.65;">
-      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
-        <div class="agent-emoji" style="filter: grayscale(0.5);">🔮</div>
-        <span class="badge badge-soon">Coming Soon</span>
-      </div>
-      <div style="font-size: 18px; font-weight: 700; margin-bottom: 4px; color: var(--text-muted);">ORACLE</div>
-      <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">AI Intelligence</div>
-      <div style="font-size: 11px; color: var(--text-muted); line-height: 1.6;">
-        Monitors AI landscape. Tracks models, trends, competitors.
-      </div>
-    </div>
-
-    <!-- NOVA -->
-    <div class="card" style="padding: 24px; opacity: 0.65;">
-      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
-        <div class="agent-emoji" style="filter: grayscale(0.5);">🔍</div>
-        <span class="badge badge-soon">Coming Soon</span>
-      </div>
-      <div style="font-size: 18px; font-weight: 700; margin-bottom: 4px; color: var(--text-muted);">NOVA</div>
-      <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">The Researcher</div>
-      <div style="font-size: 11px; color: var(--text-muted); line-height: 1.6;">
-        Deep research, intelligence gathering, market analysis.
-      </div>
-    </div>
-  </div>
-
-  <!-- ─── MAIN GRID: Feed + Kanban ─── -->
-  <div style="display: grid; grid-template-columns: 380px 1fr; gap: 24px; align-items: start;">
-
-    <!-- ACTIVITY FEED -->
-    <div class="fade-in">
-      <div class="section-title">📡 Activity Feed</div>
-      <div class="card" style="padding: 20px;">
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
-          <div style="font-size: 13px; font-weight: 600; color: var(--text);">Live Log</div>
-          <div style="display: flex; align-items: center; gap: 10px;">
-            <span id="feed-refresh-label" style="font-size: 10px; color: var(--text-muted);">auto-refresh 30s</span>
-            <button class="btn-refresh" onclick="refreshFeed()">
-              <span id="feed-spinner" style="display: inline-block; font-size: 12px;">↻</span>
-              Refresh
-            </button>
+    <!-- Stats Bar -->
+    <div class="card mb-6 fade-in" style="animation-delay:0.05s">
+      <div class="card-inner p-5">
+        <div class="flex flex-wrap items-center justify-around gap-6">
+          <div class="text-center">
+            <div class="stat-value" id="stat-tasks">–</div>
+            <div class="stat-label">Tasks Active</div>
+          </div>
+          <div style="width:1px;height:40px;background:var(--border-subtle);"></div>
+          <div class="text-center">
+            <div class="stat-value" id="stat-agents">5</div>
+            <div class="stat-label">Agents Online</div>
+          </div>
+          <div style="width:1px;height:40px;background:var(--border-subtle);"></div>
+          <div class="text-center">
+            <div class="stat-value" id="stat-projects">5</div>
+            <div class="stat-label">Projects</div>
+          </div>
+          <div style="width:1px;height:40px;background:var(--border-subtle);"></div>
+          <div class="text-center">
+            <div class="stat-value" id="stat-logs">–</div>
+            <div class="stat-label">Log Entries</div>
+          </div>
+          <div style="width:1px;height:40px;background:var(--border-subtle);"></div>
+          <div class="text-center">
+            <div class="stat-value">DAY 1</div>
+            <div class="stat-label">Since Launch</div>
           </div>
         </div>
-        <div id="activity-feed" style="display: flex; flex-direction: column; gap: 16px; max-height: 500px; overflow-y: auto;">
-          <!-- Skeleton loading -->
-          <div class="skeleton" style="height: 60px;"></div>
-          <div class="skeleton" style="height: 60px;"></div>
-          <div class="skeleton" style="height: 60px;"></div>
+      </div>
+    </div>
+
+    <!-- Agent Grid -->
+    <div class="section-label mb-4 fade-in" style="animation-delay:0.1s">Agent Status</div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mb-8">
+      <!-- SAGE -->
+      <div class="card agent-card-active fade-in" style="animation-delay:0.12s">
+        <div class="card-inner p-5">
+          <div style="font-size:2.5rem;text-align:center;margin-bottom:10px;filter:drop-shadow(0 0 12px rgba(0,255,136,0.4));">🧠</div>
+          <div class="font-bold text-center text-lg mb-1">SAGE</div>
+          <div style="color:var(--text-muted);font-size:11px;text-align:center;margin-bottom:12px;">Chief of Staff</div>
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2"><div class="status-dot"></div><span style="font-size:11px;color:var(--neon);">ACTIVE</span></div>
+            <span class="badge badge-active">Primary</span>
+          </div>
+          <div style="font-size:10px;color:var(--text-dim);font-family:monospace;background:var(--bg3);padding:5px 8px;border-radius:5px;">claude-sonnet-4-6</div>
+        </div>
+      </div>
+      <!-- CODY -->
+      <div class="card agent-card-active fade-in" style="animation-delay:0.15s">
+        <div class="card-inner p-5">
+          <div style="font-size:2.5rem;text-align:center;margin-bottom:10px;filter:drop-shadow(0 0 12px rgba(0,255,136,0.4));">⚡</div>
+          <div class="font-bold text-center text-lg mb-1">CODY</div>
+          <div style="color:var(--text-muted);font-size:11px;text-align:center;margin-bottom:12px;">Builder / Engineer</div>
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2"><div class="status-dot"></div><span style="font-size:11px;color:var(--neon);">ACTIVE</span></div>
+            <span class="badge badge-active">Builder</span>
+          </div>
+          <div style="font-size:10px;color:var(--text-dim);font-family:monospace;background:var(--bg3);padding:5px 8px;border-radius:5px;">claude-sonnet-4-6</div>
+        </div>
+      </div>
+      <!-- ORACLE -->
+      <div class="card fade-in" style="animation-delay:0.18s">
+        <div class="card-inner p-5">
+          <div style="font-size:2.5rem;text-align:center;margin-bottom:10px;opacity:0.7;">🔮</div>
+          <div class="font-bold text-center text-lg mb-1">ORACLE</div>
+          <div style="color:var(--text-muted);font-size:11px;text-align:center;margin-bottom:12px;">AI Landscape Intel</div>
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2"><div class="status-dot status-dot-idle"></div><span style="font-size:11px;color:#fbbf24;">STANDBY</span></div>
+            <span class="badge badge-soon">Watcher</span>
+          </div>
+          <div style="font-size:10px;color:var(--text-dim);font-family:monospace;background:var(--bg3);padding:5px 8px;border-radius:5px;">claude-sonnet-4-6</div>
+        </div>
+      </div>
+      <!-- NOVA -->
+      <div class="card fade-in" style="animation-delay:0.21s">
+        <div class="card-inner p-5">
+          <div style="font-size:2.5rem;text-align:center;margin-bottom:10px;opacity:0.7;">🔍</div>
+          <div class="font-bold text-center text-lg mb-1">NOVA</div>
+          <div style="color:var(--text-muted);font-size:11px;text-align:center;margin-bottom:12px;">Researcher</div>
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2"><div class="status-dot status-dot-idle"></div><span style="font-size:11px;color:#fbbf24;">STANDBY</span></div>
+            <span class="badge badge-soon">Research</span>
+          </div>
+          <div style="font-size:10px;color:var(--text-dim);font-family:monospace;background:var(--bg3);padding:5px 8px;border-radius:5px;">claude-sonnet-4-6</div>
+        </div>
+      </div>
+      <!-- TITAN -->
+      <div class="card fade-in" style="animation-delay:0.24s">
+        <div class="card-inner p-5">
+          <div style="font-size:2.5rem;text-align:center;margin-bottom:10px;opacity:0.5;">🔱</div>
+          <div class="font-bold text-center text-lg mb-1">TITAN</div>
+          <div style="color:var(--text-muted);font-size:11px;text-align:center;margin-bottom:12px;">Orchestrator</div>
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2"><div class="status-dot status-dot-offline"></div><span style="font-size:11px;color:var(--text-muted);">PLANNING</span></div>
+            <span class="badge badge-soon">Future</span>
+          </div>
+          <div style="font-size:10px;color:var(--text-dim);font-family:monospace;background:var(--bg3);padding:5px 8px;border-radius:5px;">TBD</div>
         </div>
       </div>
     </div>
 
-    <!-- KANBAN BOARD -->
-    <div class="fade-in">
-      <div class="section-title">📋 Mission Board</div>
-      <div class="kanban-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
-
-        <!-- TO DO -->
-        <div class="kanban-col">
-          <div class="kanban-col-header">
-            <span style="font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">To Do</span>
-            <span id="count-todo" style="font-size: 11px; font-weight: 700; color: var(--text-muted); background: var(--bg); padding: 2px 8px; border-radius: 999px; border: 1px solid var(--border);">—</span>
+    <!-- Recent Activity -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- Activity feed -->
+      <div class="card fade-in" style="animation-delay:0.27s">
+        <div class="card-inner">
+          <div class="p-5 border-b" style="border-color:var(--border-subtle)">
+            <div class="flex items-center justify-between">
+              <div class="font-semibold" style="font-size:14px;">Recent Activity</div>
+              <button class="btn btn-ghost text-xs" onclick="loadHomeLogs()" id="home-refresh-btn">
+                <span id="home-refresh-icon">↻</span> Refresh
+              </button>
+            </div>
           </div>
-          <div id="col-todo" style="padding: 4px; min-height: 120px;">
-            <div class="skeleton" style="height: 70px; margin: 8px;"></div>
-            <div class="skeleton" style="height: 70px; margin: 8px;"></div>
-          </div>
-        </div>
-
-        <!-- IN PROGRESS -->
-        <div class="kanban-col" style="border-color: rgba(0,255,136,0.2);">
-          <div class="kanban-col-header" style="border-color: rgba(0,255,136,0.15);">
-            <span style="font-size: 12px; font-weight: 700; color: var(--neon); text-transform: uppercase; letter-spacing: 1px;">In Progress</span>
-            <span id="count-in-progress" style="font-size: 11px; font-weight: 700; color: var(--neon); background: rgba(0,255,136,0.08); padding: 2px 8px; border-radius: 999px; border: 1px solid rgba(0,255,136,0.2);">—</span>
-          </div>
-          <div id="col-in-progress" style="padding: 4px; min-height: 120px;">
-            <div class="skeleton" style="height: 70px; margin: 8px;"></div>
+          <div id="home-logs" class="p-5 space-y-4" style="max-height:300px;overflow-y:auto;">
+            <div style="color:var(--text-dim);font-size:13px;text-align:center;padding:20px 0;">Loading…</div>
           </div>
         </div>
+      </div>
 
-        <!-- DONE -->
-        <div class="kanban-col">
-          <div class="kanban-col-header">
-            <span style="font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">Done ✓</span>
-            <span id="count-done" style="font-size: 11px; font-weight: 700; color: var(--text-muted); background: var(--bg); padding: 2px 8px; border-radius: 999px; border: 1px solid var(--border);">—</span>
+      <!-- System info -->
+      <div class="card fade-in" style="animation-delay:0.3s">
+        <div class="card-inner">
+          <div class="p-5 border-b" style="border-color:var(--border-subtle)">
+            <div class="font-semibold" style="font-size:14px;">System Status</div>
           </div>
-          <div id="col-done" style="padding: 4px; min-height: 120px;">
-            <!-- empty initially -->
+          <div class="p-5 space-y-3">
+            <div class="flex items-center justify-between p-3 rounded-lg" style="background:var(--bg3)">
+              <div style="font-size:13px;">Supabase Connection</div>
+              <span class="badge badge-active" id="supabase-status">Checking…</span>
+            </div>
+            <div class="flex items-center justify-between p-3 rounded-lg" style="background:var(--bg3)">
+              <div style="font-size:13px;">Dashboard Version</div>
+              <span style="font-size:12px;color:var(--neon);font-weight:600;">v3.0</span>
+            </div>
+            <div class="flex items-center justify-between p-3 rounded-lg" style="background:var(--bg3)">
+              <div style="font-size:13px;">Build Date</div>
+              <span style="font-size:12px;color:var(--text-muted);">2026-03-08</span>
+            </div>
+            <div class="flex items-center justify-between p-3 rounded-lg" style="background:var(--bg3)">
+              <div style="font-size:13px;">OpenClaw Runtime</div>
+              <span class="badge badge-active">ONLINE</span>
+            </div>
+            <div class="flex items-center justify-between p-3 rounded-lg" style="background:var(--bg3)">
+              <div style="font-size:13px;">Mission Status</div>
+              <span class="badge badge-active">🔥 ACTIVE</span>
+            </div>
           </div>
         </div>
-
       </div>
     </div>
-  </div>
+  </div><!-- /tab-home -->
 
-  <!-- Footer -->
-  <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between;">
-    <div style="font-size: 11px; color: var(--text-muted);">
-      AIVengers Mission Control v2.0 — Built by <span class="neon-text" style="font-weight: 700;">CODY ⚡</span>
+
+  <!-- ╔═══════════════════════════════════════════════╗
+       ║  TAB 2 — TASK BOARD                           ║
+       ╚═══════════════════════════════════════════════╝ -->
+  <div id="tab-tasks" class="tab-pane">
+    <div class="flex items-center justify-between mb-6 flex-wrap gap-3">
+      <h2 class="font-bold text-xl">📋 Task Board</h2>
+      <div class="flex items-center gap-3">
+        <button class="btn btn-ghost" onclick="loadTasks()">↻ Refresh</button>
+        <button class="btn btn-primary" onclick="openNewTaskModal()">+ New Task</button>
+      </div>
     </div>
-    <div style="font-size: 11px; color: var(--text-muted);" id="last-updated">
-      Last updated: —
+
+    <div class="grid grid-cols-1 lg:grid-cols-5 gap-5">
+      <!-- Activity Feed (left col) -->
+      <div class="lg:col-span-1">
+        <div class="card h-full">
+          <div class="card-inner">
+            <div class="p-4 border-b" style="border-color:var(--border-subtle)">
+              <div class="font-semibold text-sm">⚡ Live Feed</div>
+            </div>
+            <div id="task-feed" class="p-4 space-y-3" style="max-height:70vh;overflow-y:auto;">
+              <div style="color:var(--text-dim);font-size:12px;text-align:center;padding:20px 0;">Loading…</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Kanban columns -->
+      <div class="lg:col-span-4 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        <!-- Backlog -->
+        <div>
+          <div class="kanban-col-header mb-2 flex items-center gap-2">
+            <div style="width:8px;height:8px;border-radius:50%;background:#7d8590;"></div>
+            <span class="font-semibold text-sm">Backlog</span>
+            <span id="count-todo" class="ml-auto text-xs" style="color:var(--text-dim);">0</span>
+          </div>
+          <div id="col-todo" class="kanban-col">
+            <div id="todos-todo" class="min-h-16 p-1"></div>
+          </div>
+        </div>
+        <!-- In Progress -->
+        <div>
+          <div class="kanban-col-header mb-2 flex items-center gap-2">
+            <div style="width:8px;height:8px;border-radius:50%;background:#00ff88;box-shadow:0 0 6px rgba(0,255,136,0.5);"></div>
+            <span class="font-semibold text-sm">In Progress</span>
+            <span id="count-in_progress" class="ml-auto text-xs" style="color:var(--text-dim);">0</span>
+          </div>
+          <div id="col-in_progress" class="kanban-col">
+            <div id="todos-in_progress" class="min-h-16 p-1"></div>
+          </div>
+        </div>
+        <!-- Review -->
+        <div>
+          <div class="kanban-col-header mb-2 flex items-center gap-2">
+            <div style="width:8px;height:8px;border-radius:50%;background:#818cf8;"></div>
+            <span class="font-semibold text-sm">Review</span>
+            <span id="count-review" class="ml-auto text-xs" style="color:var(--text-dim);">0</span>
+          </div>
+          <div id="col-review" class="kanban-col">
+            <div id="todos-review" class="min-h-16 p-1"></div>
+          </div>
+        </div>
+        <!-- Done -->
+        <div>
+          <div class="kanban-col-header mb-2 flex items-center gap-2">
+            <div style="width:8px;height:8px;border-radius:50%;background:#34d399;"></div>
+            <span class="font-semibold text-sm">Done</span>
+            <span id="count-done" class="ml-auto text-xs" style="color:var(--text-dim);">0</span>
+          </div>
+          <div id="col-done" class="kanban-col">
+            <div id="todos-done" class="min-h-16 p-1"></div>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
+  </div><!-- /tab-tasks -->
+
+
+  <!-- ╔═══════════════════════════════════════════════╗
+       ║  TAB 3 — CALENDAR                             ║
+       ╚═══════════════════════════════════════════════╝ -->
+  <div id="tab-calendar" class="tab-pane">
+    <div class="flex items-center justify-between mb-6 flex-wrap gap-3">
+      <div>
+        <h2 class="font-bold text-xl">📅 Calendar &amp; Schedule</h2>
+        <div id="cal-week-label" style="font-size:13px;color:var(--text-muted);margin-top:2px;"></div>
+      </div>
+      <div class="flex items-center gap-3">
+        <button class="btn btn-subtle" onclick="calPrev()">← Prev</button>
+        <button class="btn btn-subtle" onclick="calToday()">Today</button>
+        <button class="btn btn-subtle" onclick="calNext()">Next →</button>
+        <button class="btn btn-ghost" onclick="loadCalendar()">↻ Refresh</button>
+      </div>
+    </div>
+
+    <!-- Weekly grid -->
+    <div class="card mb-5">
+      <div class="card-inner p-4">
+        <div id="cal-grid" class="grid gap-2" style="grid-template-columns: repeat(7, 1fr);">
+          <!-- filled by JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Upcoming cron jobs list -->
+    <div class="card">
+      <div class="card-inner">
+        <div class="p-5 border-b" style="border-color:var(--border-subtle)">
+          <div class="font-semibold text-sm">⏱ Scheduled Jobs</div>
+        </div>
+        <div id="cron-list" class="p-5 space-y-3">
+          <div style="color:var(--text-dim);font-size:13px;text-align:center;padding:20px 0;">Loading…</div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /tab-calendar -->
+
+
+  <!-- ╔═══════════════════════════════════════════════╗
+       ║  TAB 4 — PROJECTS                             ║
+       ╚═══════════════════════════════════════════════╝ -->
+  <div id="tab-projects" class="tab-pane">
+    <div class="flex items-center justify-between mb-6 flex-wrap gap-3">
+      <h2 class="font-bold text-xl">🎯 Projects</h2>
+      <button class="btn btn-ghost" onclick="loadProjects()">↻ Refresh</button>
+    </div>
+    <div id="projects-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+      <div style="color:var(--text-dim);font-size:13px;text-align:center;padding:40px 0;grid-column:1/-1;">Loading…</div>
+    </div>
+  </div><!-- /tab-projects -->
+
+
+  <!-- ╔═══════════════════════════════════════════════╗
+       ║  TAB 5 — MEMORY BROWSER                       ║
+       ╚═══════════════════════════════════════════════╝ -->
+  <div id="tab-memory" class="tab-pane">
+    <div class="flex items-center justify-between mb-6 flex-wrap gap-3">
+      <h2 class="font-bold text-xl">🧠 Memory Browser</h2>
+      <button class="btn btn-ghost" onclick="loadMemories()">↻ Refresh</button>
+    </div>
+    <div class="mb-4">
+      <input type="text" class="input" id="memory-search" placeholder="🔍  Search memories…" oninput="filterMemories()" style="max-width:400px;" />
+    </div>
+    <div id="memories-list" class="space-y-3">
+      <div style="color:var(--text-dim);font-size:13px;text-align:center;padding:40px 0;">Loading…</div>
+    </div>
+  </div><!-- /tab-memory -->
+
+
+  <!-- ╔═══════════════════════════════════════════════╗
+       ║  TAB 6 — DOCUMENTS                            ║
+       ╚═══════════════════════════════════════════════╝ -->
+  <div id="tab-documents" class="tab-pane">
+    <div class="flex items-center justify-between mb-6 flex-wrap gap-3">
+      <h2 class="font-bold text-xl">📄 Documents</h2>
+      <button class="btn btn-ghost" onclick="loadDocuments()">↻ Refresh</button>
+    </div>
+    <div class="flex flex-wrap gap-3 mb-5">
+      <input type="text" class="input" id="doc-search" placeholder="🔍  Search documents…" oninput="filterDocs()" style="max-width:300px;flex:1;" />
+      <select class="input" id="doc-filter" onchange="filterDocs()" style="max-width:160px;">
+        <option value="">All Types</option>
+        <option value="plan">Plan</option>
+        <option value="research">Research</option>
+        <option value="content">Content</option>
+        <option value="brief">Brief</option>
+      </select>
+    </div>
+    <div id="docs-list" class="space-y-3">
+      <div style="color:var(--text-dim);font-size:13px;text-align:center;padding:40px 0;">Loading…</div>
+    </div>
+  </div><!-- /tab-documents -->
+
+
+  <!-- ╔═══════════════════════════════════════════════╗
+       ║  TAB 7 — TEAM                                 ║
+       ╚═══════════════════════════════════════════════╝ -->
+  <div id="tab-team" class="tab-pane">
+    <!-- Mission Statement -->
+    <div class="card mb-8 fade-in" style="background:linear-gradient(135deg,rgba(0,255,136,0.06),rgba(0,255,136,0.02));">
+      <div class="card-inner p-8 text-center">
+        <div style="font-size:11px;letter-spacing:3px;font-weight:700;color:var(--text-dim);text-transform:uppercase;margin-bottom:10px;">Mission Statement</div>
+        <div class="font-black glow-pulse" style="font-size:clamp(1.1rem,3vw,1.8rem);color:var(--neon);line-height:1.3;">
+          "Build the first billion-dollar business<br class="hidden md:block"/> by one man and the machine."
+        </div>
+        <div style="font-size:13px;color:var(--text-muted);margin-top:12px;">— JP Lavoie, Founder · AIVengers</div>
+      </div>
+    </div>
+
+    <!-- Chain of Command -->
+    <div class="mb-8 text-center">
+      <div class="section-label mb-6 justify-center" style="display:flex;align-items:center;gap:10px;">
+        <span style="height:1px;flex:1;background:var(--border-subtle);display:inline-block;"></span>
+        Chain of Command
+        <span style="height:1px;flex:1;background:var(--border-subtle);display:inline-block;"></span>
+      </div>
+
+      <div class="inline-flex flex-col items-center gap-2">
+        <!-- JP -->
+        <div class="card px-8 py-4" style="border-color:rgba(0,255,136,0.3);background:rgba(0,255,136,0.04);">
+          <div style="font-size:1.4rem;">👤</div>
+          <div class="font-bold" style="font-size:14px;">JP Lavoie</div>
+          <div style="font-size:11px;color:var(--text-muted);">Founder &amp; Visionary</div>
+        </div>
+        <div class="chain-line" style="height:28px;"></div>
+        <!-- SAGE -->
+        <div class="card px-8 py-4 agent-card-active" style="border-color:rgba(0,255,136,0.3);">
+          <div style="font-size:1.4rem;">🧠</div>
+          <div class="font-bold" style="font-size:14px;">SAGE</div>
+          <div style="font-size:11px;color:var(--text-muted);">Chief of Staff</div>
+        </div>
+        <div class="chain-line" style="height:28px;"></div>
+        <!-- Agents row -->
+        <div class="flex gap-4 items-start">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+            <div style="height:28px;width:1px;background:var(--border-subtle);"></div>
+            <div class="card px-4 py-3 text-center">
+              <div>⚡</div>
+              <div class="font-semibold" style="font-size:12px;">CODY</div>
+              <div style="font-size:10px;color:var(--text-muted);">Builder</div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+            <div style="height:28px;width:1px;background:var(--border-subtle);"></div>
+            <div class="card px-4 py-3 text-center">
+              <div>🔮</div>
+              <div class="font-semibold" style="font-size:12px;">ORACLE</div>
+              <div style="font-size:10px;color:var(--text-muted);">Intel</div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+            <div style="height:28px;width:1px;background:var(--border-subtle);"></div>
+            <div class="card px-4 py-3 text-center">
+              <div>🔍</div>
+              <div class="font-semibold" style="font-size:12px;">NOVA</div>
+              <div style="font-size:10px;color:var(--text-muted);">Research</div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+            <div style="height:28px;width:1px;background:var(--border-subtle);"></div>
+            <div class="card px-4 py-3 text-center" style="opacity:0.5;">
+              <div>🔱</div>
+              <div class="font-semibold" style="font-size:12px;">TITAN</div>
+              <div style="font-size:10px;color:var(--text-muted);">Orchestrator</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Agent Detail Cards -->
+    <div class="section-label mb-4">Agent Roster</div>
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5" id="team-cards">
+      <!-- Filled by JS -->
+    </div>
+  </div><!-- /tab-team -->
+
+
+  <!-- ╔═══════════════════════════════════════════════╗
+       ║  TAB 8 — OFFICE                               ║
+       ╚═══════════════════════════════════════════════╝ -->
+  <div id="tab-office" class="tab-pane">
+    <div class="flex items-center justify-between mb-6 flex-wrap gap-3">
+      <div>
+        <h2 class="font-bold text-xl">🎮 The Office</h2>
+        <div style="font-size:13px;color:var(--text-muted);margin-top:2px;">AIVengers HQ — Live Agent Presence</div>
+      </div>
+      <button class="btn btn-ghost" onclick="loadOffice()">↻ Refresh Presence</button>
+    </div>
+
+    <!-- Office room -->
+    <div class="office-room floor-tile p-6 mb-6" style="min-height:320px;">
+      <!-- Top row: SAGE, CODY -->
+      <div class="flex justify-around mb-8">
+        <div class="desk p-4 w-36 text-center" id="desk-SAGE" onclick="showDeskActivity('SAGE')">
+          <div class="agent-avatar mb-2">🧠</div>
+          <div class="desk-label">SAGE</div>
+          <div id="desk-status-SAGE" style="font-size:9px;margin-top:4px;color:var(--text-dim);">checking…</div>
+          <div style="margin-top:6px;width:100%;height:4px;background:var(--bg4);border-radius:2px;overflow:hidden;">
+            <div id="desk-bar-SAGE" style="height:100%;width:0%;background:var(--neon);border-radius:2px;transition:width 1s;"></div>
+          </div>
+        </div>
+        <div class="desk p-4 w-36 text-center" id="desk-CODY" onclick="showDeskActivity('CODY')">
+          <div class="agent-avatar mb-2">⚡</div>
+          <div class="desk-label">CODY</div>
+          <div id="desk-status-CODY" style="font-size:9px;margin-top:4px;color:var(--text-dim);">checking…</div>
+          <div style="margin-top:6px;width:100%;height:4px;background:var(--bg4);border-radius:2px;overflow:hidden;">
+            <div id="desk-bar-CODY" style="height:100%;width:0%;background:var(--neon);border-radius:2px;transition:width 1s;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Floor separator -->
+      <div style="width:100%;height:1px;background:rgba(0,255,136,0.08);margin-bottom:24px;"></div>
+
+      <!-- Bottom row: ORACLE, NOVA, TITAN -->
+      <div class="flex justify-around">
+        <div class="desk p-4 w-28 text-center" id="desk-ORACLE" onclick="showDeskActivity('ORACLE')">
+          <div class="agent-avatar mb-2">🔮</div>
+          <div class="desk-label">ORACLE</div>
+          <div id="desk-status-ORACLE" style="font-size:9px;margin-top:4px;color:var(--text-dim);">checking…</div>
+        </div>
+        <div class="desk p-4 w-28 text-center" id="desk-NOVA" onclick="showDeskActivity('NOVA')">
+          <div class="agent-avatar mb-2">🔍</div>
+          <div class="desk-label">NOVA</div>
+          <div id="desk-status-NOVA" style="font-size:9px;margin-top:4px;color:var(--text-dim);">checking…</div>
+        </div>
+        <div class="desk p-4 w-28 text-center" id="desk-TITAN" onclick="showDeskActivity('TITAN')">
+          <div class="agent-avatar mb-2">🔱</div>
+          <div class="desk-label">TITAN</div>
+          <div id="desk-status-TITAN" style="font-size:9px;margin-top:4px;color:var(--text-dim);">checking…</div>
+        </div>
+      </div>
+
+      <!-- Legend -->
+      <div style="position:absolute;bottom:14px;right:20px;font-size:10px;color:var(--text-dim);display:flex;gap:10px;align-items:center;">
+        <span>🟢 active</span><span>🟡 idle</span><span>⚫ away</span>
+      </div>
+    </div>
+
+    <!-- Activity popup -->
+    <div id="office-activity" class="card" style="display:none;">
+      <div class="card-inner p-5">
+        <div class="flex items-center justify-between mb-4">
+          <div id="office-activity-title" class="font-semibold"></div>
+          <button class="btn btn-subtle text-xs" onclick="document.getElementById('office-activity').style.display='none'">✕ Close</button>
+        </div>
+        <div id="office-activity-content" class="space-y-3"></div>
+      </div>
+    </div>
+  </div><!-- /tab-office -->
 
 </main>
 
-<!-- ═══════════════════════════════════════════════════════ SCRIPTS -->
+<!-- ═══════════════════════════════════════════════════════════
+     NEW TASK MODAL
+═══════════════════════════════════════════════════════════ -->
+<div id="new-task-modal" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeNewTaskModal()">
+  <div class="modal">
+    <div class="flex items-center justify-between mb-6">
+      <div class="font-bold text-lg">+ New Task</div>
+      <button onclick="closeNewTaskModal()" style="color:var(--text-muted);font-size:18px;cursor:pointer;line-height:1;">✕</button>
+    </div>
+    <div class="space-y-4">
+      <div>
+        <label style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:6px;">Title</label>
+        <input type="text" id="new-task-title" class="input" placeholder="What needs to be done?" />
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:6px;">Agent</label>
+          <select id="new-task-agent" class="input">
+            <option value="SAGE">SAGE 🧠</option>
+            <option value="CODY">CODY ⚡</option>
+            <option value="ORACLE">ORACLE 🔮</option>
+            <option value="NOVA">NOVA 🔍</option>
+            <option value="JP">JP 👤</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:6px;">Priority</label>
+          <select id="new-task-priority" class="input">
+            <option value="high">🔴 High</option>
+            <option value="medium" selected>🟡 Medium</option>
+            <option value="low">🔵 Low</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:6px;">Status</label>
+        <select id="new-task-status" class="input">
+          <option value="todo">Backlog</option>
+          <option value="in_progress">In Progress</option>
+          <option value="review">Review</option>
+          <option value="done">Done</option>
+        </select>
+      </div>
+    </div>
+    <div class="flex gap-3 mt-6 justify-end">
+      <button class="btn btn-subtle" onclick="closeNewTaskModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="submitNewTask()">Add Task →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     JAVASCRIPT
+═══════════════════════════════════════════════════════════ -->
 <script>
-  // ─── CONFIG ───
-  const SUPABASE_URL = 'https://rqyxldxxebdaceysuezx.supabase.co';
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxeXhsZHh4ZWJkYWNleXN1ZXp4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwMDcyMTEsImV4cCI6MjA4ODU4MzIxMX0.-lP3oNvCfhBTx61E-gPZQ4A1dovM0pMVmZeQMUaHzqw';
+// ── Supabase Init ─────────────────────────────────────────
+const SUPABASE_URL = 'https://rqyxldxxebdaceysuezx.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxeXhsZHh4ZWJkYWNleXN1ZXp4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwMDcyMTEsImV4cCI6MjA4ODU4MzIxMX0.-lP3oNvCfhBTx61E-gPZQ4A1dovM0pMVmZeQMUaHzqw';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  const { createClient } = supabase;
-  const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+// ── Clock ─────────────────────────────────────────────────
+function updateClock() {
+  const now = new Date();
+  const est = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
+  const hh = String(est.getHours()).padStart(2,'0');
+  const mm = String(est.getMinutes()).padStart(2,'0');
+  const ss = String(est.getSeconds()).padStart(2,'0');
+  document.getElementById('clock').textContent = `${hh}:${mm}:${ss}`;
+  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  document.getElementById('date-str').textContent =
+    `${days[est.getDay()]} ${months[est.getMonth()]} ${est.getDate()} — EST`;
+}
+setInterval(updateClock, 1000);
+updateClock();
 
-  // ─── CLOCK ───
-  function updateClock() {
-    const now = new Date();
-    const opts = {
-      timeZone: 'America/Toronto',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: true
-    };
-    document.getElementById('clock').textContent = now.toLocaleTimeString('en-US', opts);
+// ── Tab Switching ─────────────────────────────────────────
+const tabLoaded = {};
+function switchTab(id) {
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  // find matching nav tab
+  document.querySelectorAll('.nav-tab').forEach(t => {
+    if (t.getAttribute('onclick') === `switchTab('${id}')`) t.classList.add('active');
+  });
+  if (!tabLoaded[id]) {
+    tabLoaded[id] = true;
+    if (id === 'tasks')     { loadTasks(); loadTaskFeed(); }
+    if (id === 'calendar')  { loadCalendar(); }
+    if (id === 'projects')  { loadProjects(); }
+    if (id === 'memory')    { loadMemories(); }
+    if (id === 'documents') { loadDocuments(); }
+    if (id === 'team')      { loadTeam(); }
+    if (id === 'office')    { loadOffice(); }
   }
-  updateClock();
-  setInterval(updateClock, 1000);
+}
 
-  // ─── AGENT COLORS ───
-  const agentColors = {
-    CODY:   { color: '#00ff88', bg: 'rgba(0,255,136,0.1)' },
-    SAGE:   { color: '#60a5fa', bg: 'rgba(96,165,250,0.1)' },
-    ORACLE: { color: '#a78bfa', bg: 'rgba(167,139,250,0.1)' },
-    NOVA:   { color: '#fb923c', bg: 'rgba(251,146,60,0.1)' },
-    JP:     { color: '#f9a8d4', bg: 'rgba(249,168,212,0.1)' },
-  };
+// ── Toast ─────────────────────────────────────────────────
+function showToast(msg, type='success') {
+  const el = document.createElement('div');
+  el.className = `toast${type==='error' ? ' error' : ''}`;
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => { el.style.opacity='0'; el.style.transition='opacity 0.4s'; setTimeout(()=>el.remove(), 400); }, 3000);
+}
 
-  function agentStyle(agent) {
-    const s = agentColors[agent] || { color: '#7d8590', bg: 'rgba(125,133,144,0.1)' };
-    return s;
-  }
+// ── Time helpers ──────────────────────────────────────────
+function timeAgo(ts) {
+  const d = new Date(ts), now = new Date();
+  const diff = Math.floor((now - d) / 1000);
+  if (diff < 60) return `${diff}s ago`;
+  if (diff < 3600) return `${Math.floor(diff/60)}m ago`;
+  if (diff < 86400) return `${Math.floor(diff/3600)}h ago`;
+  return `${Math.floor(diff/86400)}d ago`;
+}
+function fmtDate(ts) {
+  return new Date(ts).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+}
 
-  // ─── EMOJI MAP ───
-  const agentEmoji = { CODY: '⚡', SAGE: '🧠', ORACLE: '🔮', NOVA: '🔍', JP: '👤' };
-  function getEmoji(agent) { return agentEmoji[agent] || '🤖'; }
+// ── Agent color map ───────────────────────────────────────
+const agentEmoji = { SAGE:'🧠', CODY:'⚡', ORACLE:'🔮', NOVA:'🔍', TITAN:'🔱', JP:'👤' };
+const agentColor = { SAGE:'#00ff88', CODY:'#00ff88', ORACLE:'#818cf8', NOVA:'#f472b6', TITAN:'#7d8590', JP:'#fbbf24' };
 
-  // ─── TIME AGO ───
-  function timeAgo(dateStr) {
-    const date = new Date(dateStr);
-    const now = new Date();
-    const diff = Math.floor((now - date) / 1000);
-    if (diff < 60) return `${diff}s ago`;
-    if (diff < 3600) return `${Math.floor(diff/60)}m ago`;
-    if (diff < 86400) return `${Math.floor(diff/3600)}h ago`;
-    return `${Math.floor(diff/86400)}d ago`;
-  }
-
-  // ─── ACTIVITY FEED ───
-  async function refreshFeed() {
-    const spinner = document.getElementById('feed-spinner');
-    spinner.classList.add('spinning');
-
-    try {
-      const { data, error } = await db
-        .from('agent_logs')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(20);
-
-      const feed = document.getElementById('activity-feed');
-
-      if (error) {
-        feed.innerHTML = `<div class="empty-state" style="color: #f87171;">⚠️ Error loading feed<br><small>${error.message}</small></div>`;
-        return;
-      }
-
-      if (!data || data.length === 0) {
-        feed.innerHTML = `<div class="empty-state">No activity yet. Tables may need setup.</div>`;
-        return;
-      }
-
-      feed.innerHTML = data.map((log, i) => {
-        const style = agentStyle(log.agent);
-        const emoji = getEmoji(log.agent);
-        return `
-          <div class="log-entry" style="animation-delay: ${i * 0.05}s;">
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-              <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; color: ${style.color}; background: ${style.bg}; padding: 2px 8px; border-radius: 999px;">
-                ${emoji} ${log.agent}
-              </span>
-              <span style="font-size: 11px; color: var(--text-muted);">${timeAgo(log.created_at)}</span>
-            </div>
-            <div style="font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 2px;">${escapeHtml(log.action)}</div>
-            ${log.details ? `<div style="font-size: 12px; color: var(--text-muted);">${escapeHtml(log.details)}</div>` : ''}
+// ════════════════════════════════════════════════════════
+//  TAB 1 — HOME
+// ════════════════════════════════════════════════════════
+async function loadHomeLogs() {
+  const el = document.getElementById('home-logs');
+  const icon = document.getElementById('home-refresh-icon');
+  icon.classList.add('spinning');
+  try {
+    const { data, error } = await sb.from('agent_logs').select('*').order('created_at', { ascending: false }).limit(10);
+    if (error) throw error;
+    document.getElementById('supabase-status').textContent = 'Connected';
+    document.getElementById('supabase-status').className = 'badge badge-active';
+    document.getElementById('stat-logs').textContent = data.length >= 10 ? '10+' : data.length;
+    el.innerHTML = data.length === 0
+      ? '<div style="color:var(--text-dim);font-size:13px;text-align:center;padding:20px 0;">No logs yet.</div>'
+      : data.map(l => `
+        <div class="log-entry">
+          <div class="flex items-center gap-2 mb-1">
+            <span style="font-size:13px;">${agentEmoji[l.agent]||'🤖'}</span>
+            <span class="font-semibold" style="font-size:13px;color:${agentColor[l.agent]||'var(--neon)'};">${l.agent}</span>
+            <span style="font-size:11px;color:var(--text-dim);margin-left:auto;">${timeAgo(l.created_at)}</span>
           </div>
-        `;
-      }).join('');
+          <div style="font-size:12px;color:var(--text-muted);">${l.action}</div>
+          ${l.details ? `<div style="font-size:11px;color:var(--text-dim);margin-top:2px;">${l.details}</div>` : ''}
+        </div>`).join('');
+  } catch(e) {
+    document.getElementById('supabase-status').textContent = 'Error';
+    document.getElementById('supabase-status').className = 'badge badge-high';
+    el.innerHTML = `<div style="color:#f87171;font-size:12px;">${e.message}</div>`;
+  }
+  icon.classList.remove('spinning');
+}
 
-    } finally {
-      spinner.classList.remove('spinning');
-      updateTimestamp();
+async function loadHomeStats() {
+  try {
+    const { data } = await sb.from('todos').select('status');
+    if (data) {
+      const active = data.filter(t => t.status !== 'done').length;
+      document.getElementById('stat-tasks').textContent = active;
     }
+  } catch(e) {}
+}
+
+// ════════════════════════════════════════════════════════
+//  TAB 2 — TASKS
+// ════════════════════════════════════════════════════════
+async function loadTasks() {
+  const cols = ['todo','in_progress','review','done'];
+  cols.forEach(c => { document.getElementById('todos-'+c).innerHTML = ''; document.getElementById('count-'+c).textContent = '0'; });
+  try {
+    const { data, error } = await sb.from('todos').select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+    const counts = { todo:0, in_progress:0, review:0, done:0 };
+    data.forEach(t => {
+      const col = cols.includes(t.status) ? t.status : 'todo';
+      counts[col]++;
+      const card = document.createElement('div');
+      card.className = 'todo-card fade-in';
+      card.innerHTML = `
+        <div class="font-semibold mb-2" style="font-size:13px;line-height:1.4;">${t.title}</div>
+        <div class="flex items-center gap-2 flex-wrap">
+          ${t.agent ? `<span style="font-size:11px;color:${agentColor[t.agent]||'var(--text-muted)'};">${agentEmoji[t.agent]||''} ${t.agent}</span>` : ''}
+          ${t.priority ? `<span class="badge badge-${t.priority} ml-auto">${t.priority}</span>` : ''}
+        </div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:6px;">${timeAgo(t.created_at)}</div>`;
+      document.getElementById('todos-'+col).appendChild(card);
+    });
+    cols.forEach(c => document.getElementById('count-'+c).textContent = counts[c]);
+  } catch(e) {
+    showToast('Failed to load tasks: '+e.message, 'error');
+  }
+}
+
+async function loadTaskFeed() {
+  const el = document.getElementById('task-feed');
+  try {
+    const { data } = await sb.from('agent_logs').select('*').order('created_at', { ascending: false }).limit(20);
+    if (!data) return;
+    el.innerHTML = data.map(l => `
+      <div class="log-entry">
+        <div class="flex items-center gap-1 mb-0.5">
+          <span style="font-size:12px;">${agentEmoji[l.agent]||'🤖'}</span>
+          <span style="font-size:12px;font-weight:600;color:${agentColor[l.agent]||'var(--neon)'};">${l.agent}</span>
+          <span style="font-size:10px;color:var(--text-dim);margin-left:auto;">${timeAgo(l.created_at)}</span>
+        </div>
+        <div style="font-size:11px;color:var(--text-muted);">${l.action}</div>
+      </div>`).join('');
+  } catch(e) {}
+}
+
+// New Task Modal
+function openNewTaskModal() { document.getElementById('new-task-modal').style.display='flex'; }
+function closeNewTaskModal() { document.getElementById('new-task-modal').style.display='none'; }
+
+async function submitNewTask() {
+  const title = document.getElementById('new-task-title').value.trim();
+  if (!title) { showToast('Task title is required', 'error'); return; }
+  const agent = document.getElementById('new-task-agent').value;
+  const priority = document.getElementById('new-task-priority').value;
+  const status = document.getElementById('new-task-status').value;
+  try {
+    const { error } = await sb.from('todos').insert([{ title, agent, priority, status }]);
+    if (error) throw error;
+    // Log it
+    await sb.from('agent_logs').insert([{ agent, action: 'New task created', details: title }]);
+    showToast('✅ Task added!');
+    closeNewTaskModal();
+    document.getElementById('new-task-title').value = '';
+    tabLoaded.tasks = false;
+    loadTasks();
+    loadTaskFeed();
+  } catch(e) {
+    showToast('Error: '+e.message, 'error');
+  }
+}
+
+// ════════════════════════════════════════════════════════
+//  TAB 3 — CALENDAR
+// ════════════════════════════════════════════════════════
+let calOffset = 0; // weeks offset
+
+function getWeekStart(offset=0) {
+  const now = new Date();
+  const day = now.getDay();
+  const diff = now.getDate() - day + (day === 0 ? -6 : 1); // Monday
+  const monday = new Date(now.setDate(diff + offset * 7));
+  monday.setHours(0,0,0,0);
+  return monday;
+}
+
+async function loadCalendar() {
+  const weekStart = getWeekStart(calOffset);
+  const weekEnd = new Date(weekStart); weekEnd.setDate(weekEnd.getDate() + 7);
+
+  // Week label
+  const opts = { month:'short', day:'numeric' };
+  const ws = new Date(weekStart); const we = new Date(weekEnd); we.setDate(we.getDate()-1);
+  document.getElementById('cal-week-label').textContent =
+    `Week of ${ws.toLocaleDateString('en-US', opts)} — ${we.toLocaleDateString('en-US', opts)}`;
+
+  // Build grid
+  const grid = document.getElementById('cal-grid');
+  grid.innerHTML = '';
+  const dayNames = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const today = new Date(); today.setHours(0,0,0,0);
+
+  // Load cron jobs
+  let cronData = [];
+  try {
+    const { data } = await sb.from('cron_jobs').select('*').eq('active', true);
+    cronData = data || [];
+  } catch(e) {}
+
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(weekStart); d.setDate(d.getDate() + i);
+    const isToday = d.getTime() === today.getTime();
+    const cell = document.createElement('div');
+    cell.className = `cal-cell${isToday ? ' today' : ''}`;
+
+    const dayNum = document.createElement('div');
+    dayNum.style.cssText = `font-size:10px;font-weight:700;text-transform:uppercase;color:${isToday?'var(--neon)':'var(--text-dim)'};letter-spacing:1px;margin-bottom:6px;`;
+    dayNum.textContent = `${dayNames[i]} ${d.getDate()}`;
+    cell.appendChild(dayNum);
+
+    // Add cron events that match this day
+    cronData.forEach(job => {
+      const ev = document.createElement('div');
+      ev.className = 'cal-event';
+      ev.title = job.description || job.schedule;
+      ev.textContent = `${agentEmoji[job.agent]||'⏱'} ${job.description||job.schedule}`;
+      cell.appendChild(ev);
+    });
+
+    grid.appendChild(cell);
   }
 
-  // ─── KANBAN / TODOS ───
-  async function refreshTodos() {
-    try {
-      const { data, error } = await db
-        .from('todos')
-        .select('*')
-        .order('created_at', { ascending: true });
-
-      if (error || !data) {
-        ['col-todo','col-in-progress','col-done'].forEach(id => {
-          document.getElementById(id).innerHTML = `<div class="empty-state" style="font-size: 11px; color: #f87171;">Error loading</div>`;
-        });
-        return;
-      }
-
-      const byStatus = { todo: [], in_progress: [], done: [] };
-      data.forEach(t => {
-        if (byStatus[t.status]) byStatus[t.status].push(t);
-      });
-
-      // Update counts
-      document.getElementById('count-todo').textContent = byStatus.todo.length;
-      document.getElementById('count-in-progress').textContent = byStatus.in_progress.length;
-      document.getElementById('count-done').textContent = byStatus.done.length;
-
-      // Update stats
-      document.getElementById('stat-tasks-today').textContent = data.length;
-      document.getElementById('stat-in-progress').textContent = byStatus.in_progress.length;
-      document.getElementById('stat-done').textContent = byStatus.done.length;
-
-      // Render columns
-      renderCol('col-todo', byStatus.todo);
-      renderCol('col-in-progress', byStatus.in_progress);
-      renderCol('col-done', byStatus.done, true);
-
-    } catch(e) {
-      console.error('Todos error:', e);
-    }
-  }
-
-  function renderCol(colId, items, isDone = false) {
-    const col = document.getElementById(colId);
-    if (items.length === 0) {
-      col.innerHTML = `<div class="empty-state" style="font-size: 11px; padding: 20px;">Empty</div>`;
+  // Cron list
+  const cronEl = document.getElementById('cron-list');
+  try {
+    const { data } = await sb.from('cron_jobs').select('*').order('created_at');
+    if (!data || data.length === 0) {
+      cronEl.innerHTML = '<div style="color:var(--text-dim);font-size:13px;text-align:center;padding:20px 0;">No scheduled jobs yet.</div>';
       return;
     }
-    col.innerHTML = items.map((todo, i) => {
-      const style = agentStyle(todo.agent);
-      const priorityClass = `badge-${todo.priority || 'medium'}`;
-      const doneStyle = isDone ? 'opacity: 0.6; text-decoration: line-through;' : '';
-      return `
-        <div class="todo-card" style="animation: fadeInUp 0.3s ease ${i*0.05}s both; ${isDone ? 'border-color: rgba(0,255,136,0.08);' : ''}">
-          <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 8px;">
-            <div style="font-size: 12px; font-weight: 600; color: var(--text); line-height: 1.4; ${doneStyle}">${escapeHtml(todo.title)}</div>
-            ${isDone ? '<span style="color: var(--neon); font-size: 14px; flex-shrink: 0;">✓</span>' : ''}
-          </div>
-          <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-            ${todo.agent ? `<span style="font-size: 10px; font-weight: 700; color: ${style.color}; background: ${style.bg}; padding: 2px 7px; border-radius: 999px;">${getEmoji(todo.agent)} ${todo.agent}</span>` : ''}
-            <span class="badge ${priorityClass}">${todo.priority || 'medium'}</span>
+    cronEl.innerHTML = data.map(j => `
+      <div class="flex items-center gap-4 p-3 rounded-lg" style="background:var(--bg3);">
+        <div style="font-size:1.2rem;">${agentEmoji[j.agent]||'⏱'}</div>
+        <div class="flex-1">
+          <div class="font-semibold" style="font-size:13px;">${j.description||'Scheduled job'}</div>
+          <div style="font-size:11px;color:var(--text-muted);">
+            <code style="background:var(--bg4);padding:2px 6px;border-radius:4px;">${j.schedule}</code>
+            · ${j.agent}
           </div>
         </div>
-      `;
+        <span class="badge ${j.active ? 'badge-active' : 'badge-soon'}">${j.active ? 'Active' : 'Paused'}</span>
+        ${j.next_run ? `<div style="font-size:11px;color:var(--text-dim);">${fmtDate(j.next_run)}</div>` : ''}
+      </div>`).join('');
+  } catch(e) {
+    cronEl.innerHTML = `<div style="color:#f87171;font-size:12px;">${e.message}</div>`;
+  }
+}
+
+function calPrev()  { calOffset--; loadCalendar(); }
+function calNext()  { calOffset++; loadCalendar(); }
+function calToday() { calOffset=0;  loadCalendar(); }
+
+// ════════════════════════════════════════════════════════
+//  TAB 4 — PROJECTS
+// ════════════════════════════════════════════════════════
+async function loadProjects() {
+  const el = document.getElementById('projects-grid');
+  el.innerHTML = '<div style="color:var(--text-dim);font-size:13px;text-align:center;padding:40px 0;grid-column:1/-1;">Loading…</div>';
+  try {
+    const { data, error } = await sb.from('projects').select('*').order('updated_at', { ascending: false });
+    if (error) throw error;
+    if (!data || data.length === 0) {
+      el.innerHTML = '<div style="color:var(--text-dim);font-size:13px;text-align:center;padding:40px 0;grid-column:1/-1;">No projects found.</div>';
+      return;
+    }
+    document.getElementById('stat-projects').textContent = data.length;
+    el.innerHTML = data.map(p => {
+      const pct = Math.min(100, Math.max(0, p.progress||0));
+      const statusClass = { active:'badge-active-proj', paused:'badge-paused', review:'badge-review', done:'badge-active' }[p.status] || 'badge-soon';
+      return `
+      <div class="card fade-in">
+        <div class="card-inner p-6">
+          <div class="flex items-start justify-between gap-3 mb-3">
+            <div class="font-bold" style="font-size:15px;line-height:1.3;">${p.name}</div>
+            <span class="badge ${statusClass} flex-shrink-0">${p.status||'active'}</span>
+          </div>
+          ${p.description ? `<div style="font-size:13px;color:var(--text-muted);margin-bottom:14px;line-height:1.5;">${p.description}</div>` : ''}
+          <div class="mb-1 flex items-center justify-between">
+            <span style="font-size:11px;color:var(--text-dim);font-weight:600;text-transform:uppercase;letter-spacing:1px;">Progress</span>
+            <span style="font-size:14px;font-weight:800;color:var(--neon);">${pct}%</span>
+          </div>
+          <div class="progress-track mb-4">
+            <div class="progress-fill" style="width:${pct}%;"></div>
+          </div>
+          ${p.updated_at ? `<div style="font-size:11px;color:var(--text-dim);">Updated ${fmtDate(p.updated_at)}</div>` : ''}
+        </div>
+      </div>`;
     }).join('');
+  } catch(e) {
+    el.innerHTML = `<div style="color:#f87171;font-size:12px;grid-column:1/-1;text-align:center;">${e.message}</div>`;
   }
+}
 
-  // ─── HELPERS ───
-  function escapeHtml(str) {
-    if (!str) return '';
-    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+// ════════════════════════════════════════════════════════
+//  TAB 5 — MEMORY
+// ════════════════════════════════════════════════════════
+let _allMemories = [];
+
+async function loadMemories() {
+  const el = document.getElementById('memories-list');
+  el.innerHTML = '<div style="color:var(--text-dim);font-size:13px;text-align:center;padding:40px 0;">Loading…</div>';
+  try {
+    const { data, error } = await sb.from('memories').select('*').order('date', { ascending: false }).order('created_at', { ascending: false });
+    if (error) throw error;
+    _allMemories = data || [];
+    renderMemories(_allMemories);
+  } catch(e) {
+    el.innerHTML = `<div style="color:#f87171;font-size:12px;">${e.message}</div>`;
   }
+}
 
-  function updateTimestamp() {
-    const now = new Date();
-    document.getElementById('last-updated').textContent = 'Last updated: ' + now.toLocaleTimeString('en-US', {
-      timeZone: 'America/Toronto',
-      hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true
-    });
+function renderMemories(items) {
+  const el = document.getElementById('memories-list');
+  if (!items || items.length === 0) {
+    el.innerHTML = '<div style="color:var(--text-dim);font-size:13px;text-align:center;padding:40px 0;">No memories yet.</div>';
+    return;
   }
+  // Group by date
+  const grouped = {};
+  items.forEach(m => {
+    const d = m.date || m.created_at?.split('T')[0] || 'Unknown';
+    if (!grouped[d]) grouped[d] = [];
+    grouped[d].push(m);
+  });
+  el.innerHTML = Object.entries(grouped).map(([date, entries]) => `
+    <div>
+      <div class="section-label mb-3" style="font-size:11px;">${date}</div>
+      <div class="space-y-2">
+        ${entries.map(m => `
+          <div class="memory-entry">
+            <div class="flex items-center gap-2 mb-2">
+              <span style="font-size:14px;">${agentEmoji[m.agent]||'💭'}</span>
+              <span style="font-size:12px;font-weight:600;color:${agentColor[m.agent]||'var(--text-muted)'};">${m.agent||'Unknown'}</span>
+              <span style="font-size:11px;color:var(--text-dim);margin-left:auto;">${timeAgo(m.created_at)}</span>
+            </div>
+            <div style="font-size:13px;color:var(--text);line-height:1.6;">${m.content||''}</div>
+          </div>`).join('')}
+      </div>
+    </div>`).join('<div style="height:16px;"></div>');
+}
 
-  // ─── INIT ───
-  async function init() {
-    await Promise.all([refreshFeed(), refreshTodos()]);
+function filterMemories() {
+  const q = document.getElementById('memory-search').value.toLowerCase();
+  if (!q) { renderMemories(_allMemories); return; }
+  const filtered = _allMemories.filter(m =>
+    (m.content||'').toLowerCase().includes(q) ||
+    (m.agent||'').toLowerCase().includes(q) ||
+    (m.date||'').includes(q));
+  renderMemories(filtered);
+}
+
+// ════════════════════════════════════════════════════════
+//  TAB 6 — DOCUMENTS
+// ════════════════════════════════════════════════════════
+let _allDocs = [];
+
+async function loadDocuments() {
+  const el = document.getElementById('docs-list');
+  el.innerHTML = '<div style="color:var(--text-dim);font-size:13px;text-align:center;padding:40px 0;">Loading…</div>';
+  try {
+    const { data, error } = await sb.from('documents').select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+    _allDocs = data || [];
+    renderDocs(_allDocs);
+  } catch(e) {
+    el.innerHTML = `<div style="color:#f87171;font-size:12px;">${e.message}</div>`;
   }
+}
 
-  // Auto-refresh every 30s
-  setInterval(() => {
-    refreshFeed();
-    refreshTodos();
-  }, 30000);
+function renderDocs(items) {
+  const el = document.getElementById('docs-list');
+  if (!items || items.length === 0) {
+    el.innerHTML = '<div style="color:var(--text-dim);font-size:13px;text-align:center;padding:40px 0;">No documents found.</div>';
+    return;
+  }
+  el.innerHTML = items.map(d => `
+    <div class="card" style="cursor:pointer;" onclick="toggleDoc('doc-${d.id}')">
+      <div class="card-inner p-5">
+        <div class="flex items-start gap-3 flex-wrap">
+          <div style="font-size:1.4rem;flex-shrink:0;">${{plan:'📋',research:'🔬',content:'✍️',brief:'📝'}[d.doc_type]||'📄'}</div>
+          <div class="flex-1 min-w-0">
+            <div class="font-semibold mb-1" style="font-size:14px;">${d.title||'Untitled'}</div>
+            <div class="flex items-center gap-2 flex-wrap">
+              ${d.doc_type ? `<span class="badge badge-${d.doc_type}">${d.doc_type}</span>` : ''}
+              ${d.agent ? `<span style="font-size:11px;color:${agentColor[d.agent]||'var(--text-muted)'};">${agentEmoji[d.agent]||''} ${d.agent}</span>` : ''}
+              <span style="font-size:11px;color:var(--text-dim);margin-left:auto;">${fmtDate(d.created_at)}</span>
+            </div>
+          </div>
+        </div>
+        ${d.content ? `<div id="doc-${d.id}" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--border-subtle);font-size:13px;color:var(--text-muted);line-height:1.7;white-space:pre-wrap;">${d.content}</div>` : ''}
+      </div>
+    </div>`).join('');
+}
 
-  // Boot
-  init();
+function toggleDoc(id) {
+  const el = document.getElementById(id);
+  if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+function filterDocs() {
+  const q = document.getElementById('doc-search').value.toLowerCase();
+  const type = document.getElementById('doc-filter').value;
+  let filtered = _allDocs;
+  if (q) filtered = filtered.filter(d => (d.title||'').toLowerCase().includes(q) || (d.content||'').toLowerCase().includes(q));
+  if (type) filtered = filtered.filter(d => d.doc_type === type);
+  renderDocs(filtered);
+}
+
+// ════════════════════════════════════════════════════════
+//  TAB 7 — TEAM
+// ════════════════════════════════════════════════════════
+const AGENTS = [
+  { name:'SAGE', emoji:'🧠', role:'Chief of Staff — JP\'s daily strategic partner', status:'active', model:'claude-sonnet-4-6', description:'The strategic mind of AIVengers. Manages coordination, morning briefings, and decision support.' },
+  { name:'CODY', emoji:'⚡', role:'Builder & Engineer', status:'active', model:'claude-sonnet-4-6', description:'Builds dashboards, pipelines, automations, and any technical system the team needs.' },
+  { name:'ORACLE', emoji:'🔮', role:'AI Landscape Intelligence', status:'standby', model:'claude-sonnet-4-6', description:'Monitors the AI/tech landscape, evaluates new models, and surfaces strategic insights.' },
+  { name:'NOVA', emoji:'🔍', role:'Researcher', status:'standby', model:'claude-sonnet-4-6', description:'Deep research on competitors, markets, trends, and anything requiring investigative digging.' },
+  { name:'TITAN', emoji:'🔱', role:'Orchestrator (Coming Soon)', status:'planning', model:'TBD', description:'Future orchestration layer that will coordinate multi-agent workflows at scale.' },
+];
+
+async function loadTeam() {
+  const container = document.getElementById('team-cards');
+  // Load last log per agent
+  let lastLogs = {};
+  try {
+    const { data } = await sb.from('agent_logs').select('*').order('created_at', { ascending: false }).limit(50);
+    (data||[]).forEach(l => { if (!lastLogs[l.agent]) lastLogs[l.agent] = l; });
+  } catch(e) {}
+
+  container.innerHTML = AGENTS.map(a => {
+    const last = lastLogs[a.name];
+    const statusBadge = { active:'badge-active', standby:'badge-idle', planning:'badge-soon' }[a.status] || 'badge-soon';
+    const statusLabel = { active:'● ACTIVE', standby:'◐ STANDBY', planning:'○ PLANNING' }[a.status] || a.status;
+    return `
+    <div class="card agent-card-${a.status === 'active' ? 'active' : ''} fade-in">
+      <div class="card-inner p-6">
+        <div class="flex items-start gap-4 mb-4">
+          <div style="font-size:2.8rem;filter:${a.status==='active'?'drop-shadow(0 0 12px rgba(0,255,136,0.4))':a.status==='planning'?'grayscale(1)':'none'};">${a.emoji}</div>
+          <div class="flex-1">
+            <div class="font-black text-lg">${a.name}</div>
+            <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px;">${a.role}</div>
+            <span class="badge ${statusBadge}">${statusLabel}</span>
+          </div>
+        </div>
+        <div style="font-size:13px;color:var(--text-muted);line-height:1.6;margin-bottom:14px;">${a.description}</div>
+        <div class="flex items-center justify-between p-3 rounded-lg" style="background:var(--bg3);">
+          <span style="font-size:11px;color:var(--text-dim);">Model</span>
+          <code style="font-size:11px;color:var(--neon);">${a.model}</code>
+        </div>
+        ${last ? `
+        <div class="mt-3 p-3 rounded-lg" style="background:var(--bg3);">
+          <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:4px;">Last Activity</div>
+          <div style="font-size:12px;color:var(--text-muted);">${last.action}</div>
+          <div style="font-size:10px;color:var(--text-dim);margin-top:2px;">${timeAgo(last.created_at)}</div>
+        </div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ════════════════════════════════════════════════════════
+//  TAB 8 — OFFICE
+// ════════════════════════════════════════════════════════
+async function loadOffice() {
+  const agents = ['SAGE','CODY','ORACLE','NOVA','TITAN'];
+  let lastLogs = {};
+  try {
+    const { data } = await sb.from('agent_logs').select('*').order('created_at', { ascending: false }).limit(100);
+    (data||[]).forEach(l => { if (!lastLogs[l.agent]) lastLogs[l.agent] = l; });
+  } catch(e) {}
+
+  const now = new Date();
+  agents.forEach(name => {
+    const deskEl = document.getElementById('desk-'+name);
+    const statusEl = document.getElementById('desk-status-'+name);
+    const barEl = document.getElementById('desk-bar-'+name);
+    if (!deskEl) return;
+
+    const last = lastLogs[name];
+    let isActive = false, isIdle = false;
+
+    if (last) {
+      const diff = (now - new Date(last.created_at)) / 60000; // minutes
+      if (diff < 60) isActive = true;
+      else if (diff < 240) isIdle = true;
+    }
+
+    // Update avatar class
+    const avatarEl = deskEl.querySelector('.agent-avatar');
+    if (avatarEl) {
+      deskEl.className = `desk p-4 text-center ${isActive ? 'agent-active' : 'agent-away'}` +
+        (name==='SAGE'||name==='CODY' ? ' w-36' : ' w-28');
+      if (barEl) barEl.style.width = isActive ? '85%' : isIdle ? '30%' : '0%';
+    }
+
+    if (statusEl) {
+      if (isActive) {
+        statusEl.textContent = '🟢 at desk';
+        statusEl.style.color = 'var(--neon)';
+      } else if (isIdle) {
+        statusEl.textContent = '🟡 idle';
+        statusEl.style.color = '#fbbf24';
+      } else {
+        statusEl.textContent = '⚫ away';
+        statusEl.style.color = 'var(--text-dim)';
+      }
+    }
+  });
+}
+
+async function showDeskActivity(name) {
+  const panel = document.getElementById('office-activity');
+  const title = document.getElementById('office-activity-title');
+  const content = document.getElementById('office-activity-content');
+  title.innerHTML = `${agentEmoji[name]||'🤖'} ${name} — Recent Activity`;
+  content.innerHTML = '<div style="color:var(--text-dim);font-size:12px;">Loading…</div>';
+  panel.style.display = 'block';
+
+  try {
+    const { data } = await sb.from('agent_logs').select('*').eq('agent', name).order('created_at', { ascending: false }).limit(5);
+    if (!data || data.length === 0) {
+      content.innerHTML = '<div style="color:var(--text-dim);font-size:12px;">No recent activity for this agent.</div>';
+      return;
+    }
+    content.innerHTML = data.map(l => `
+      <div class="log-entry">
+        <div class="font-semibold" style="font-size:13px;">${l.action}</div>
+        ${l.details ? `<div style="font-size:11px;color:var(--text-muted);">${l.details}</div>` : ''}
+        <div style="font-size:10px;color:var(--text-dim);margin-top:2px;">${timeAgo(l.created_at)}</div>
+      </div>`).join('');
+  } catch(e) {
+    content.innerHTML = `<div style="color:#f87171;font-size:12px;">${e.message}</div>`;
+  }
+}
+
+// ════════════════════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════════════════════
+(async function init() {
+  // Load home tab data
+  await loadHomeLogs();
+  await loadHomeStats();
+})();
 </script>
-
 </body>
 </html>
