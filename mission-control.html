@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AIVengers — Mission Control v2.0</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --neon: #00ff88;
+      --neon-dim: #00cc6a;
+      --neon-glow: rgba(0, 255, 136, 0.15);
+      --bg: #0d1117;
+      --bg2: #161b22;
+      --bg3: #1c2128;
+      --border: rgba(0, 255, 136, 0.15);
+      --text: #e6edf3;
+      --text-muted: #7d8590;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Animated grid background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,255,136,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,255,136,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Radial glow at top */
+    body::after {
+      content: '';
+      position: fixed;
+      top: -200px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 800px;
+      height: 400px;
+      background: radial-gradient(ellipse, rgba(0,255,136,0.08) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container { position: relative; z-index: 1; }
+
+    /* Header */
+    .header {
+      background: rgba(22, 27, 34, 0.9);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    /* Neon text */
+    .neon-text {
+      color: var(--neon);
+      text-shadow: 0 0 20px rgba(0,255,136,0.5), 0 0 40px rgba(0,255,136,0.2);
+    }
+
+    /* Cards */
+    .card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(0,255,136,0.03) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .card:hover {
+      border-color: rgba(0,255,136,0.35);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(0,255,136,0.08);
+    }
+    .card:hover::before { opacity: 1; }
+
+    /* Agent card accent line */
+    .agent-card-active::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--neon), transparent);
+    }
+
+    /* Status dot pulse */
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 0 0 rgba(0,255,136,0.4); }
+      50% { opacity: 0.9; transform: scale(1.1); box-shadow: 0 0 0 6px rgba(0,255,136,0); }
+    }
+    .status-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: var(--neon);
+      animation: pulse-dot 2s ease-in-out infinite;
+      display: inline-block;
+    }
+    .status-dot-inactive {
+      background: #4a5568;
+      animation: none;
+      box-shadow: none;
+    }
+
+    /* Pill badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .badge-active {
+      background: rgba(0,255,136,0.12);
+      color: var(--neon);
+      border: 1px solid rgba(0,255,136,0.25);
+    }
+    .badge-soon {
+      background: rgba(125,133,144,0.12);
+      color: var(--text-muted);
+      border: 1px solid rgba(125,133,144,0.2);
+    }
+    .badge-high {
+      background: rgba(239,68,68,0.12);
+      color: #f87171;
+      border: 1px solid rgba(239,68,68,0.2);
+    }
+    .badge-medium {
+      background: rgba(251,146,60,0.12);
+      color: #fb923c;
+      border: 1px solid rgba(251,146,60,0.2);
+    }
+    .badge-low {
+      background: rgba(125,133,144,0.12);
+      color: var(--text-muted);
+      border: 1px solid rgba(125,133,144,0.2);
+    }
+
+    /* Activity feed */
+    .log-entry {
+      border-left: 2px solid var(--border);
+      padding-left: 16px;
+      position: relative;
+      transition: border-color 0.3s;
+    }
+    .log-entry:hover { border-left-color: var(--neon); }
+    .log-entry::before {
+      content: '';
+      position: absolute;
+      left: -5px; top: 6px;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--bg3);
+      border: 2px solid var(--border);
+      transition: border-color 0.3s, background 0.3s;
+    }
+    .log-entry:hover::before {
+      border-color: var(--neon);
+      background: rgba(0,255,136,0.2);
+    }
+
+    /* Kanban columns */
+    .kanban-col {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      min-height: 200px;
+    }
+    .kanban-col-header {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Todo cards */
+    .todo-card {
+      background: var(--bg3);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 8px;
+      padding: 12px;
+      margin: 8px;
+      transition: all 0.2s ease;
+      cursor: default;
+    }
+    .todo-card:hover {
+      border-color: rgba(0,255,136,0.2);
+      background: rgba(28,33,40,0.9);
+    }
+
+    /* Stats bar */
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--neon);
+      line-height: 1;
+      text-shadow: 0 0 20px rgba(0,255,136,0.4);
+    }
+    .stat-label {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* Divider */
+    .stat-divider {
+      width: 1px;
+      height: 40px;
+      background: var(--border);
+    }
+
+    /* Refresh button */
+    .btn-refresh {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 8px;
+      background: rgba(0,255,136,0.08);
+      border: 1px solid rgba(0,255,136,0.2);
+      color: var(--neon);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-refresh:hover {
+      background: rgba(0,255,136,0.15);
+      border-color: rgba(0,255,136,0.4);
+    }
+
+    /* Spinner */
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .spinning { animation: spin 1s linear infinite; }
+
+    /* Fade in animation */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in {
+      animation: fadeInUp 0.4s ease forwards;
+    }
+
+    /* Section title */
+    .section-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* Agent emoji */
+    .agent-emoji {
+      font-size: 2rem;
+      line-height: 1;
+      filter: drop-shadow(0 0 8px rgba(0,255,136,0.3));
+    }
+
+    /* Clock */
+    #clock {
+      font-variant-numeric: tabular-nums;
+      font-weight: 600;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: rgba(0,255,136,0.2); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(0,255,136,0.4); }
+
+    /* Empty state */
+    .empty-state {
+      padding: 32px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    /* Loading skeleton */
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+    .skeleton {
+      background: linear-gradient(90deg, var(--bg2) 25%, var(--bg3) 50%, var(--bg2) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 6px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .kanban-grid { grid-template-columns: 1fr !important; }
+      .agents-grid { grid-template-columns: 1fr 1fr !important; }
+      .stats-bar { flex-wrap: wrap; gap: 16px; }
+      .stat-divider { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════ HEADER -->
+<header class="header">
+  <div style="max-width: 1400px; margin: 0 auto; padding: 0 24px;">
+    <div style="display: flex; align-items: center; justify-content: space-between; height: 64px;">
+
+      <!-- Logo & Title -->
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <div style="position: relative;">
+          <div style="width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg, rgba(0,255,136,0.2), rgba(0,255,136,0.05)); border: 1px solid rgba(0,255,136,0.3); display: flex; align-items: center; justify-content: center; font-size: 20px;">⚡</div>
+          <div style="position: absolute; inset: -2px; border-radius: 12px; border: 1px solid rgba(0,255,136,0.1);"></div>
+        </div>
+        <div>
+          <div style="font-size: 18px; font-weight: 800; letter-spacing: -0.5px; color: #e6edf3;">
+            AI<span class="neon-text">VENGERS</span>
+          </div>
+          <div style="font-size: 10px; color: var(--text-muted); letter-spacing: 1.5px; text-transform: uppercase; margin-top: 1px;">
+            Mission Control v2.0
+          </div>
+        </div>
+      </div>
+
+      <!-- Tagline (hidden on small screens) -->
+      <div style="font-size: 12px; color: var(--text-muted); font-style: italic; letter-spacing: 0.5px; display: none; text-align: center;" class="md-tagline">
+        "One man. The machine. The empire."
+      </div>
+
+      <!-- Right side: clock + status -->
+      <div style="display: flex; align-items: center; gap: 20px;">
+        <div style="text-align: right;">
+          <div id="clock">--:--:-- --</div>
+          <div style="font-size: 10px; color: var(--text-muted); letter-spacing: 1px;">EST / EDT</div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; padding: 6px 14px; background: rgba(0,255,136,0.06); border: 1px solid rgba(0,255,136,0.15); border-radius: 8px;">
+          <span class="status-dot"></span>
+          <span style="font-size: 12px; font-weight: 600; color: var(--neon);">ONLINE</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tagline for medium+ -->
+    <div style="padding-bottom: 10px; text-align: center; font-size: 12px; color: var(--text-muted); font-style: italic; letter-spacing: 0.5px;">
+      "One man. The machine. The empire."
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════════════════════ MAIN -->
+<main class="container" style="max-width: 1400px; margin: 0 auto; padding: 32px 24px;">
+
+  <!-- ─── QUICK STATS BAR ─── -->
+  <div class="card fade-in" style="padding: 24px 32px; margin-bottom: 32px;">
+    <div class="stats-bar" style="display: flex; align-items: center; justify-content: space-around; gap: 24px;">
+      <div class="stat-item">
+        <div class="stat-value" id="stat-tasks-today">—</div>
+        <div class="stat-label">Tasks Today</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <div class="stat-value">2</div>
+        <div class="stat-label">Active Agents</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <div class="stat-value" id="stat-in-progress">—</div>
+        <div class="stat-label">In Progress</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <div class="stat-value" id="stat-done">—</div>
+        <div class="stat-label">Completed</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <div class="stat-value neon-text">3</div>
+        <div class="stat-label">Systems Online</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── AGENT CARDS ─── -->
+  <div class="section-title fade-in">⚡ Agent Roster</div>
+  <div class="agents-grid fade-in" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 40px;">
+
+    <!-- CODY -->
+    <div class="card agent-card-active" style="padding: 24px;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+        <div class="agent-emoji">⚡</div>
+        <span class="badge badge-active">● Active</span>
+      </div>
+      <div style="font-size: 18px; font-weight: 700; margin-bottom: 4px;">CODY</div>
+      <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">The Builder</div>
+      <div style="font-size: 11px; color: var(--text-muted); line-height: 1.6;">
+        Codes, builds, deploys. Full-stack agent. No task too big.
+      </div>
+    </div>
+
+    <!-- SAGE -->
+    <div class="card agent-card-active" style="padding: 24px;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+        <div class="agent-emoji">🧠</div>
+        <span class="badge badge-active">● Active</span>
+      </div>
+      <div style="font-size: 18px; font-weight: 700; margin-bottom: 4px;">SAGE</div>
+      <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Chief of Staff</div>
+      <div style="font-size: 11px; color: var(--text-muted); line-height: 1.6;">
+        Strategy, coordination, daily briefings. JP's right hand.
+      </div>
+    </div>
+
+    <!-- ORACLE -->
+    <div class="card" style="padding: 24px; opacity: 0.65;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+        <div class="agent-emoji" style="filter: grayscale(0.5);">🔮</div>
+        <span class="badge badge-soon">Coming Soon</span>
+      </div>
+      <div style="font-size: 18px; font-weight: 700; margin-bottom: 4px; color: var(--text-muted);">ORACLE</div>
+      <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">AI Intelligence</div>
+      <div style="font-size: 11px; color: var(--text-muted); line-height: 1.6;">
+        Monitors AI landscape. Tracks models, trends, competitors.
+      </div>
+    </div>
+
+    <!-- NOVA -->
+    <div class="card" style="padding: 24px; opacity: 0.65;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+        <div class="agent-emoji" style="filter: grayscale(0.5);">🔍</div>
+        <span class="badge badge-soon">Coming Soon</span>
+      </div>
+      <div style="font-size: 18px; font-weight: 700; margin-bottom: 4px; color: var(--text-muted);">NOVA</div>
+      <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">The Researcher</div>
+      <div style="font-size: 11px; color: var(--text-muted); line-height: 1.6;">
+        Deep research, intelligence gathering, market analysis.
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── MAIN GRID: Feed + Kanban ─── -->
+  <div style="display: grid; grid-template-columns: 380px 1fr; gap: 24px; align-items: start;">
+
+    <!-- ACTIVITY FEED -->
+    <div class="fade-in">
+      <div class="section-title">📡 Activity Feed</div>
+      <div class="card" style="padding: 20px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+          <div style="font-size: 13px; font-weight: 600; color: var(--text);">Live Log</div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span id="feed-refresh-label" style="font-size: 10px; color: var(--text-muted);">auto-refresh 30s</span>
+            <button class="btn-refresh" onclick="refreshFeed()">
+              <span id="feed-spinner" style="display: inline-block; font-size: 12px;">↻</span>
+              Refresh
+            </button>
+          </div>
+        </div>
+        <div id="activity-feed" style="display: flex; flex-direction: column; gap: 16px; max-height: 500px; overflow-y: auto;">
+          <!-- Skeleton loading -->
+          <div class="skeleton" style="height: 60px;"></div>
+          <div class="skeleton" style="height: 60px;"></div>
+          <div class="skeleton" style="height: 60px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KANBAN BOARD -->
+    <div class="fade-in">
+      <div class="section-title">📋 Mission Board</div>
+      <div class="kanban-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+
+        <!-- TO DO -->
+        <div class="kanban-col">
+          <div class="kanban-col-header">
+            <span style="font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">To Do</span>
+            <span id="count-todo" style="font-size: 11px; font-weight: 700; color: var(--text-muted); background: var(--bg); padding: 2px 8px; border-radius: 999px; border: 1px solid var(--border);">—</span>
+          </div>
+          <div id="col-todo" style="padding: 4px; min-height: 120px;">
+            <div class="skeleton" style="height: 70px; margin: 8px;"></div>
+            <div class="skeleton" style="height: 70px; margin: 8px;"></div>
+          </div>
+        </div>
+
+        <!-- IN PROGRESS -->
+        <div class="kanban-col" style="border-color: rgba(0,255,136,0.2);">
+          <div class="kanban-col-header" style="border-color: rgba(0,255,136,0.15);">
+            <span style="font-size: 12px; font-weight: 700; color: var(--neon); text-transform: uppercase; letter-spacing: 1px;">In Progress</span>
+            <span id="count-in-progress" style="font-size: 11px; font-weight: 700; color: var(--neon); background: rgba(0,255,136,0.08); padding: 2px 8px; border-radius: 999px; border: 1px solid rgba(0,255,136,0.2);">—</span>
+          </div>
+          <div id="col-in-progress" style="padding: 4px; min-height: 120px;">
+            <div class="skeleton" style="height: 70px; margin: 8px;"></div>
+          </div>
+        </div>
+
+        <!-- DONE -->
+        <div class="kanban-col">
+          <div class="kanban-col-header">
+            <span style="font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">Done ✓</span>
+            <span id="count-done" style="font-size: 11px; font-weight: 700; color: var(--text-muted); background: var(--bg); padding: 2px 8px; border-radius: 999px; border: 1px solid var(--border);">—</span>
+          </div>
+          <div id="col-done" style="padding: 4px; min-height: 120px;">
+            <!-- empty initially -->
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between;">
+    <div style="font-size: 11px; color: var(--text-muted);">
+      AIVengers Mission Control v2.0 — Built by <span class="neon-text" style="font-weight: 700;">CODY ⚡</span>
+    </div>
+    <div style="font-size: 11px; color: var(--text-muted);" id="last-updated">
+      Last updated: —
+    </div>
+  </div>
+
+</main>
+
+<!-- ═══════════════════════════════════════════════════════ SCRIPTS -->
+<script>
+  // ─── CONFIG ───
+  const SUPABASE_URL = 'https://rqyxldxxebdaceysuezx.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxeXhsZHh4ZWJkYWNleXN1ZXp4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwMDcyMTEsImV4cCI6MjA4ODU4MzIxMX0.-lP3oNvCfhBTx61E-gPZQ4A1dovM0pMVmZeQMUaHzqw';
+
+  const { createClient } = supabase;
+  const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  // ─── CLOCK ───
+  function updateClock() {
+    const now = new Date();
+    const opts = {
+      timeZone: 'America/Toronto',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true
+    };
+    document.getElementById('clock').textContent = now.toLocaleTimeString('en-US', opts);
+  }
+  updateClock();
+  setInterval(updateClock, 1000);
+
+  // ─── AGENT COLORS ───
+  const agentColors = {
+    CODY:   { color: '#00ff88', bg: 'rgba(0,255,136,0.1)' },
+    SAGE:   { color: '#60a5fa', bg: 'rgba(96,165,250,0.1)' },
+    ORACLE: { color: '#a78bfa', bg: 'rgba(167,139,250,0.1)' },
+    NOVA:   { color: '#fb923c', bg: 'rgba(251,146,60,0.1)' },
+    JP:     { color: '#f9a8d4', bg: 'rgba(249,168,212,0.1)' },
+  };
+
+  function agentStyle(agent) {
+    const s = agentColors[agent] || { color: '#7d8590', bg: 'rgba(125,133,144,0.1)' };
+    return s;
+  }
+
+  // ─── EMOJI MAP ───
+  const agentEmoji = { CODY: '⚡', SAGE: '🧠', ORACLE: '🔮', NOVA: '🔍', JP: '👤' };
+  function getEmoji(agent) { return agentEmoji[agent] || '🤖'; }
+
+  // ─── TIME AGO ───
+  function timeAgo(dateStr) {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diff = Math.floor((now - date) / 1000);
+    if (diff < 60) return `${diff}s ago`;
+    if (diff < 3600) return `${Math.floor(diff/60)}m ago`;
+    if (diff < 86400) return `${Math.floor(diff/3600)}h ago`;
+    return `${Math.floor(diff/86400)}d ago`;
+  }
+
+  // ─── ACTIVITY FEED ───
+  async function refreshFeed() {
+    const spinner = document.getElementById('feed-spinner');
+    spinner.classList.add('spinning');
+
+    try {
+      const { data, error } = await db
+        .from('agent_logs')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(20);
+
+      const feed = document.getElementById('activity-feed');
+
+      if (error) {
+        feed.innerHTML = `<div class="empty-state" style="color: #f87171;">⚠️ Error loading feed<br><small>${error.message}</small></div>`;
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        feed.innerHTML = `<div class="empty-state">No activity yet. Tables may need setup.</div>`;
+        return;
+      }
+
+      feed.innerHTML = data.map((log, i) => {
+        const style = agentStyle(log.agent);
+        const emoji = getEmoji(log.agent);
+        return `
+          <div class="log-entry" style="animation-delay: ${i * 0.05}s;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+              <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; color: ${style.color}; background: ${style.bg}; padding: 2px 8px; border-radius: 999px;">
+                ${emoji} ${log.agent}
+              </span>
+              <span style="font-size: 11px; color: var(--text-muted);">${timeAgo(log.created_at)}</span>
+            </div>
+            <div style="font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 2px;">${escapeHtml(log.action)}</div>
+            ${log.details ? `<div style="font-size: 12px; color: var(--text-muted);">${escapeHtml(log.details)}</div>` : ''}
+          </div>
+        `;
+      }).join('');
+
+    } finally {
+      spinner.classList.remove('spinning');
+      updateTimestamp();
+    }
+  }
+
+  // ─── KANBAN / TODOS ───
+  async function refreshTodos() {
+    try {
+      const { data, error } = await db
+        .from('todos')
+        .select('*')
+        .order('created_at', { ascending: true });
+
+      if (error || !data) {
+        ['col-todo','col-in-progress','col-done'].forEach(id => {
+          document.getElementById(id).innerHTML = `<div class="empty-state" style="font-size: 11px; color: #f87171;">Error loading</div>`;
+        });
+        return;
+      }
+
+      const byStatus = { todo: [], in_progress: [], done: [] };
+      data.forEach(t => {
+        if (byStatus[t.status]) byStatus[t.status].push(t);
+      });
+
+      // Update counts
+      document.getElementById('count-todo').textContent = byStatus.todo.length;
+      document.getElementById('count-in-progress').textContent = byStatus.in_progress.length;
+      document.getElementById('count-done').textContent = byStatus.done.length;
+
+      // Update stats
+      document.getElementById('stat-tasks-today').textContent = data.length;
+      document.getElementById('stat-in-progress').textContent = byStatus.in_progress.length;
+      document.getElementById('stat-done').textContent = byStatus.done.length;
+
+      // Render columns
+      renderCol('col-todo', byStatus.todo);
+      renderCol('col-in-progress', byStatus.in_progress);
+      renderCol('col-done', byStatus.done, true);
+
+    } catch(e) {
+      console.error('Todos error:', e);
+    }
+  }
+
+  function renderCol(colId, items, isDone = false) {
+    const col = document.getElementById(colId);
+    if (items.length === 0) {
+      col.innerHTML = `<div class="empty-state" style="font-size: 11px; padding: 20px;">Empty</div>`;
+      return;
+    }
+    col.innerHTML = items.map((todo, i) => {
+      const style = agentStyle(todo.agent);
+      const priorityClass = `badge-${todo.priority || 'medium'}`;
+      const doneStyle = isDone ? 'opacity: 0.6; text-decoration: line-through;' : '';
+      return `
+        <div class="todo-card" style="animation: fadeInUp 0.3s ease ${i*0.05}s both; ${isDone ? 'border-color: rgba(0,255,136,0.08);' : ''}">
+          <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 8px;">
+            <div style="font-size: 12px; font-weight: 600; color: var(--text); line-height: 1.4; ${doneStyle}">${escapeHtml(todo.title)}</div>
+            ${isDone ? '<span style="color: var(--neon); font-size: 14px; flex-shrink: 0;">✓</span>' : ''}
+          </div>
+          <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+            ${todo.agent ? `<span style="font-size: 10px; font-weight: 700; color: ${style.color}; background: ${style.bg}; padding: 2px 7px; border-radius: 999px;">${getEmoji(todo.agent)} ${todo.agent}</span>` : ''}
+            <span class="badge ${priorityClass}">${todo.priority || 'medium'}</span>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // ─── HELPERS ───
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function updateTimestamp() {
+    const now = new Date();
+    document.getElementById('last-updated').textContent = 'Last updated: ' + now.toLocaleTimeString('en-US', {
+      timeZone: 'America/Toronto',
+      hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true
+    });
+  }
+
+  // ─── INIT ───
+  async function init() {
+    await Promise.all([refreshFeed(), refreshTodos()]);
+  }
+
+  // Auto-refresh every 30s
+  setInterval(() => {
+    refreshFeed();
+    refreshTodos();
+  }, 30000);
+
+  // Boot
+  init();
+</script>
+
+</body>
+</html>
