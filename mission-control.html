@@ -285,6 +285,30 @@
     }
     .cal-event:hover { background: rgba(0,255,136,0.15); }
 
+    /* ── Scheduled Posts ───────────────────────────────── */
+    .sp-filter-btn {
+      padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 500;
+      background: var(--bg3); border: 1px solid var(--border-subtle);
+      color: var(--text-muted); cursor: pointer; transition: all 0.2s;
+    }
+    .sp-filter-btn:hover { border-color: rgba(0,255,136,0.3); color: var(--text); }
+    .sp-filter-btn.active { background: rgba(0,255,136,0.12); border-color: rgba(0,255,136,0.4); color: var(--neon); }
+    .sp-card {
+      background: var(--bg3);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px; padding: 14px 16px;
+      transition: all 0.2s;
+    }
+    .sp-card:hover { border-color: rgba(0,255,136,0.2); }
+    .sp-card.posted { opacity: 0.55; }
+    .sp-account-cody { color: #60a5fa; }
+    .sp-account-aivengers { color: #a78bfa; }
+    .sp-time { font-size: 11px; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+    .sp-preview { font-size: 12px; color: var(--text); margin-top: 6px; line-height: 1.5; }
+    .sp-badge-pending { background: rgba(251,191,36,0.12); color: #fbbf24; border: 1px solid rgba(251,191,36,0.2); padding: 2px 8px; border-radius: 20px; font-size: 10px; font-weight: 600; }
+    .sp-badge-posted  { background: rgba(0,255,136,0.12); color: var(--neon); border: 1px solid var(--border); padding: 2px 8px; border-radius: 20px; font-size: 10px; font-weight: 600; }
+    .sp-badge-soon    { background: rgba(249,115,22,0.12); color: #f97316; border: 1px solid rgba(249,115,22,0.2); padding: 2px 8px; border-radius: 20px; font-size: 10px; font-weight: 600; }
+
     /* ── Memory / Journal ──────────────────────────────── */
     .memory-entry {
       background: var(--bg2);
@@ -643,6 +667,136 @@
         </div>
       </div>
     </div>
+    <!-- ── Credits & Usage Widget ─────────────────────── -->
+    <div class="mt-6 fade-in" style="animation-delay:0.35s">
+      <div class="section-label mb-4">💳 Credits &amp; API Usage</div>
+      <div class="card">
+        <div class="card-inner">
+          <!-- Header -->
+          <div class="p-5 border-b flex items-center justify-between flex-wrap gap-3" style="border-color:var(--border-subtle)">
+            <div>
+              <div class="font-semibold" style="font-size:14px;">Credits &amp; API Status</div>
+              <div style="font-size:11px;color:var(--text-dim);margin-top:2px;">Auto-refreshes every 5 min</div>
+            </div>
+            <div class="flex items-center gap-3">
+              <span style="font-size:11px;color:var(--text-dim);" id="credits-last-updated">Never updated</span>
+              <button class="btn btn-ghost" onclick="refreshCredits()" style="font-size:12px;padding:6px 14px;">
+                <span id="credits-refresh-icon">↻</span> Refresh
+              </button>
+            </div>
+          </div>
+
+          <!-- Provider rows -->
+          <div class="p-5 space-y-3">
+
+            <!-- ── Anthropic Claude ── -->
+            <div class="flex items-center justify-between p-4 rounded-xl flex-wrap gap-3"
+                 style="background:var(--bg3);border:1px solid var(--border-subtle);">
+              <div class="flex items-center gap-3">
+                <div style="width:40px;height:40px;background:rgba(210,140,100,0.12);border:1px solid rgba(210,140,100,0.25);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">🧠</div>
+                <div>
+                  <div class="font-semibold" style="font-size:13px;">Anthropic Claude</div>
+                  <div id="anthropic-detail" style="font-size:11px;color:var(--text-muted);">Checking API key…</div>
+                </div>
+              </div>
+              <div class="flex items-center gap-3 ml-auto">
+                <div class="text-right">
+                  <div id="anthropic-value" class="font-black" style="font-size:22px;color:var(--neon);text-shadow:0 0 16px rgba(0,255,136,0.4);line-height:1;">—</div>
+                  <div id="anthropic-label" style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1.2px;font-weight:600;">Loading…</div>
+                </div>
+                <a href="https://console.anthropic.com/settings/billing" target="_blank"
+                   class="btn btn-ghost" style="font-size:11px;padding:5px 12px;white-space:nowrap;">
+                  Console ↗
+                </a>
+              </div>
+            </div>
+
+            <!-- ── OpenAI ── -->
+            <div class="flex items-center justify-between p-4 rounded-xl flex-wrap gap-3"
+                 style="background:var(--bg3);border:1px solid var(--border-subtle);">
+              <div class="flex items-center gap-3">
+                <div style="width:40px;height:40px;background:rgba(116,195,149,0.1);border:1px solid rgba(116,195,149,0.2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">🌿</div>
+                <div>
+                  <div class="font-semibold" style="font-size:13px;">OpenAI</div>
+                  <div style="font-size:11px;color:var(--text-muted);">GPT-4o / o3 / DALL·E</div>
+                </div>
+              </div>
+              <div class="flex items-center gap-3 ml-auto">
+                <div class="text-right">
+                  <div id="openai-value" class="font-black" style="font-size:22px;color:var(--text-dim);line-height:1;">—</div>
+                  <div id="openai-label" style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1.2px;font-weight:600;">Not configured</div>
+                </div>
+                <a href="https://platform.openai.com/account/billing" target="_blank"
+                   class="btn btn-subtle" style="font-size:11px;padding:5px 12px;white-space:nowrap;">
+                  Console ↗
+                </a>
+              </div>
+            </div>
+
+            <!-- ── MiniMax ── -->
+            <div class="flex items-center justify-between p-4 rounded-xl flex-wrap gap-3"
+                 style="background:var(--bg3);border:1px solid var(--border-subtle);">
+              <div class="flex items-center gap-3">
+                <div style="width:40px;height:40px;background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">🎬</div>
+                <div>
+                  <div class="font-semibold" style="font-size:13px;">MiniMax</div>
+                  <div style="font-size:11px;color:var(--text-muted);">Video &amp; Audio generation</div>
+                </div>
+              </div>
+              <div class="flex items-center gap-3 ml-auto">
+                <div class="text-right">
+                  <div id="minimax-value" class="font-black" style="font-size:22px;color:var(--text-dim);line-height:1;">—</div>
+                  <div id="minimax-label" style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1.2px;font-weight:600;">Not configured</div>
+                </div>
+                <a href="https://www.minimaxi.com/user-center/finance/recharge" target="_blank"
+                   class="btn btn-subtle" style="font-size:11px;padding:5px 12px;white-space:nowrap;">
+                  Console ↗
+                </a>
+              </div>
+            </div>
+
+          </div><!-- /space-y-3 -->
+
+          <!-- Key configuration row -->
+          <div class="px-5 pb-2" id="credits-config-row">
+            <div class="p-4 rounded-xl" style="background:rgba(0,255,136,0.04);border:1px solid rgba(0,255,136,0.12);">
+              <div class="flex items-center justify-between mb-3">
+                <span style="font-size:12px;font-weight:600;color:var(--text);">🔑 API Keys (stored locally)</span>
+                <button class="btn btn-subtle" onclick="toggleCreditsConfig()" id="credits-config-toggle" style="font-size:11px;padding:4px 10px;">
+                  Configure
+                </button>
+              </div>
+              <div id="credits-config-inputs" style="display:none;" class="space-y-2">
+                <div class="flex gap-2">
+                  <input id="input-anthropic-key" type="password" placeholder="Anthropic API key (sk-ant-api03-… or sk-ant-admin-…)"
+                    class="input" style="font-size:12px;padding:7px 12px;flex:1;" />
+                  <button class="btn btn-ghost" onclick="saveCreditsKeys()" style="font-size:11px;padding:7px 14px;white-space:nowrap;">Save</button>
+                  <button class="btn btn-subtle" onclick="clearCreditsKeys()" style="font-size:11px;padding:7px 10px;">✕</button>
+                </div>
+                <div style="font-size:10px;color:var(--text-dim);line-height:1.6;padding:0 2px;">
+                  Keys are saved in your browser only — never sent anywhere except the respective API.
+                  Use an <strong style="color:var(--text);">Admin key</strong> (<code style="background:var(--bg4);padding:1px 4px;border-radius:3px;">sk-ant-admin…</code>) for monthly usage data.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Info footer -->
+          <div class="px-5 pb-5 pt-2">
+            <div class="flex items-start gap-2 p-3 rounded-lg"
+                 style="background:rgba(0,255,136,0.03);border:1px solid rgba(255,255,255,0.05);">
+              <span style="color:var(--text-muted);font-size:12px;flex-shrink:0;">ℹ</span>
+              <div style="font-size:11px;color:var(--text-dim);line-height:1.7;">
+                Anthropic live balance requires an Admin API key. Standard keys confirm <strong style="color:var(--text);">API status</strong>.
+                OpenAI &amp; MiniMax show once keys are configured above.
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div><!-- /credits widget -->
+
   </div><!-- /tab-home -->
 
 
@@ -751,12 +905,36 @@
     </div>
 
     <!-- Upcoming cron jobs list -->
-    <div class="card">
+    <div class="card mb-5">
       <div class="card-inner">
         <div class="p-5 border-b" style="border-color:var(--border-subtle)">
           <div class="font-semibold text-sm">⏱ Scheduled Jobs</div>
         </div>
         <div id="cron-list" class="p-5 space-y-3">
+          <div style="color:var(--text-dim);font-size:13px;text-align:center;padding:20px 0;">Loading…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Scheduled Posts ───────────────────────────────── -->
+    <div class="card">
+      <div class="card-inner">
+        <div class="p-5 border-b flex items-center justify-between" style="border-color:var(--border-subtle)">
+          <div>
+            <div class="font-semibold text-sm">🐦 Scheduled Posts Queue</div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Upcoming X / Twitter posts for @Cody_AIVengers &amp; @AIVengers1</div>
+          </div>
+          <button class="btn btn-ghost" onclick="loadScheduledPosts()" style="font-size:11px;">↻ Refresh</button>
+        </div>
+        <!-- Filter tabs -->
+        <div class="flex gap-2 px-5 pt-4 pb-2">
+          <button id="spf-all" class="sp-filter-btn active" onclick="filterScheduledPosts('all')">All</button>
+          <button id="spf-cody" class="sp-filter-btn" onclick="filterScheduledPosts('cody')">⚡ @Cody_AIVengers</button>
+          <button id="spf-aivengers" class="sp-filter-btn" onclick="filterScheduledPosts('aivengers')">🏛️ @AIVengers1</button>
+          <button id="spf-pending" class="sp-filter-btn" onclick="filterScheduledPosts('pending')">⏳ Pending</button>
+          <button id="spf-posted" class="sp-filter-btn" onclick="filterScheduledPosts('posted')">✅ Posted</button>
+        </div>
+        <div id="scheduled-posts-list" class="p-5 space-y-3">
           <div style="color:var(--text-dim);font-size:13px;text-align:center;padding:20px 0;">Loading…</div>
         </div>
       </div>
@@ -1592,12 +1770,224 @@ async function showDeskActivity(name) {
 }
 
 // ════════════════════════════════════════════════════════
+//  CREDITS & USAGE WIDGET
+// ════════════════════════════════════════════════════════
+
+// Keys are stored in localStorage only — never hardcoded in source
+function getCreditsKeys() {
+  return {
+    anthropic: localStorage.getItem('credits_anthropic_key') || '',
+    openai:    localStorage.getItem('credits_openai_key')    || '',
+    minimax:   localStorage.getItem('credits_minimax_key')   || '',
+  };
+}
+
+function saveCreditsKeys() {
+  const antInput = document.getElementById('input-anthropic-key');
+  if (antInput && antInput.value.trim()) {
+    localStorage.setItem('credits_anthropic_key', antInput.value.trim());
+  }
+  toggleCreditsConfig();
+  refreshCredits();
+  showToast('API keys saved to local storage ✓');
+}
+
+function clearCreditsKeys() {
+  localStorage.removeItem('credits_anthropic_key');
+  localStorage.removeItem('credits_openai_key');
+  localStorage.removeItem('credits_minimax_key');
+  const inp = document.getElementById('input-anthropic-key');
+  if (inp) inp.value = '';
+  toggleCreditsConfig();
+  showToast('API keys cleared');
+  refreshCredits();
+}
+
+function toggleCreditsConfig() {
+  const inputs  = document.getElementById('credits-config-inputs');
+  const toggleBtn = document.getElementById('credits-config-toggle');
+  if (!inputs) return;
+  const open = inputs.style.display === 'none' || inputs.style.display === '';
+  inputs.style.display = open ? 'block' : 'none';
+  if (toggleBtn) toggleBtn.textContent = open ? 'Close' : 'Configure';
+  if (open) {
+    // Pre-fill masked values if keys exist
+    const keys = getCreditsKeys();
+    const antInp = document.getElementById('input-anthropic-key');
+    if (antInp && keys.anthropic) antInp.placeholder = '••••••••••••' + keys.anthropic.slice(-8);
+  }
+}
+
+async function refreshCredits() {
+  const icon = document.getElementById('credits-refresh-icon');
+  if (icon) icon.classList.add('spinning');
+
+  const keys = getCreditsKeys();
+
+  await Promise.allSettled([
+    checkAnthropic(keys.anthropic),
+    checkOpenAI(keys.openai),
+    checkMinimax(keys.minimax),
+  ]);
+
+  const now = new Date();
+  const ts = now.toLocaleTimeString('en-CA', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+  const el = document.getElementById('credits-last-updated');
+  if (el) el.textContent = `Updated ${ts}`;
+
+  if (icon) icon.classList.remove('spinning');
+}
+
+async function checkAnthropic(apiKey) {
+  const valEl   = document.getElementById('anthropic-value');
+  const labelEl = document.getElementById('anthropic-label');
+  const detEl   = document.getElementById('anthropic-detail');
+
+  if (!apiKey) {
+    if (valEl)   { valEl.textContent = '—'; valEl.style.color = 'var(--text-dim)'; valEl.style.fontSize = '22px'; }
+    if (labelEl) { labelEl.textContent = 'No key set'; labelEl.style.color = 'var(--text-dim)'; }
+    if (detEl)   { detEl.textContent = 'Click Configure above to add your Anthropic API key'; }
+    return;
+  }
+
+  try {
+    // Verify API key via /v1/models (supports browser CORS via special header)
+    const modelsResp = await fetch('https://api.anthropic.com/v1/models', {
+      method: 'GET',
+      headers: {
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true',
+      }
+    });
+
+    if (!modelsResp.ok) {
+      const err = await modelsResp.json().catch(() => ({}));
+      throw new Error(err.error?.message || `HTTP ${modelsResp.status}`);
+    }
+
+    const modelsData = await modelsResp.json();
+    const modelCount = (modelsData.data || []).length;
+
+    // Key is valid ✓ — show active status
+    if (valEl)   { valEl.textContent = '✓'; valEl.style.color = 'var(--neon)'; valEl.style.fontSize = '28px'; }
+    if (labelEl) { labelEl.textContent = 'API Active'; labelEl.style.color = 'var(--neon)'; }
+    if (detEl)   { detEl.textContent = `${modelCount} models available`; }
+
+    // Try to fetch current-month usage (requires Admin key — fails gracefully with standard key)
+    try {
+      const now = new Date();
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+      const usageResp = await fetch(
+        `https://api.anthropic.com/v1/organizations/usage_report/messages?starting_at=${encodeURIComponent(startOfMonth)}&ending_at=${encodeURIComponent(now.toISOString())}&bucket_width=1d`,
+        {
+          headers: {
+            'x-api-key': apiKey,
+            'anthropic-version': '2023-06-01',
+            'anthropic-dangerous-direct-browser-access': 'true',
+          }
+        }
+      );
+
+      if (usageResp.ok) {
+        const usageData = await usageResp.json();
+        const buckets = usageData.data || [];
+        let totalInput = 0, totalOutput = 0, totalCost = 0;
+        buckets.forEach(b => {
+          totalInput  += b.input_tokens  || 0;
+          totalOutput += b.output_tokens || 0;
+          totalCost   += b.cost_usd      || 0;
+        });
+        const totalTokens = totalInput + totalOutput;
+        const fmtTokens = totalTokens >= 1e6
+          ? (totalTokens / 1e6).toFixed(2) + 'M'
+          : totalTokens >= 1e3
+            ? (totalTokens / 1e3).toFixed(1) + 'K'
+            : String(totalTokens);
+
+        if (totalCost > 0) {
+          if (valEl)   { valEl.textContent = '$' + totalCost.toFixed(2); valEl.style.fontSize = '20px'; }
+          if (labelEl) { labelEl.textContent = 'Used this month'; }
+          if (detEl)   { detEl.textContent = `${fmtTokens} tokens · ${totalInput.toLocaleString()} in / ${totalOutput.toLocaleString()} out`; }
+        } else if (totalTokens > 0) {
+          if (valEl)   { valEl.textContent = fmtTokens; valEl.style.fontSize = '22px'; }
+          if (labelEl) { labelEl.textContent = 'Tokens this month'; }
+          if (detEl)   { detEl.textContent = `${totalInput.toLocaleString()} in · ${totalOutput.toLocaleString()} out`; }
+        }
+      }
+    } catch (_) {
+      // Usage endpoint failed (needs Admin key) — silently ignore, API Active is enough
+    }
+
+  } catch (err) {
+    if (valEl)   { valEl.textContent = '⚠'; valEl.style.color = '#f87171'; valEl.style.fontSize = '24px'; }
+    if (labelEl) { labelEl.textContent = 'Error'; labelEl.style.color = '#f87171'; }
+    if (detEl) {
+      const msg = String(err.message || '');
+      detEl.textContent = (msg.toLowerCase().includes('fetch') || msg.toLowerCase().includes('cors') || msg === '')
+        ? 'Network error — check browser CORS or use Console link'
+        : msg;
+    }
+  }
+}
+
+async function checkOpenAI(apiKey) {
+  const valEl   = document.getElementById('openai-value');
+  const labelEl = document.getElementById('openai-label');
+
+  if (!apiKey) {
+    if (valEl)   { valEl.textContent = '—'; valEl.style.color = 'var(--text-dim)'; }
+    if (labelEl) { labelEl.textContent = 'Not configured'; labelEl.style.color = 'var(--text-dim)'; }
+    return;
+  }
+
+  try {
+    const resp = await fetch('https://api.openai.com/v1/models', {
+      headers: { 'Authorization': `Bearer ${apiKey}` }
+    });
+    if (resp.ok) {
+      if (valEl)   { valEl.textContent = '✓'; valEl.style.color = '#74c395'; valEl.style.fontSize = '28px'; }
+      if (labelEl) { labelEl.textContent = 'API Active'; labelEl.style.color = '#74c395'; }
+    } else {
+      throw new Error(`HTTP ${resp.status}`);
+    }
+  } catch (e) {
+    if (valEl)   { valEl.textContent = '⚠'; valEl.style.color = '#f87171'; }
+    if (labelEl) { labelEl.textContent = 'Error'; labelEl.style.color = '#f87171'; }
+  }
+}
+
+async function checkMinimax(apiKey) {
+  const valEl   = document.getElementById('minimax-value');
+  const labelEl = document.getElementById('minimax-label');
+
+  if (!apiKey) {
+    if (valEl)   { valEl.textContent = '—'; valEl.style.color = 'var(--text-dim)'; }
+    if (labelEl) { labelEl.textContent = 'Not configured'; labelEl.style.color = 'var(--text-dim)'; }
+    return;
+  }
+
+  // MiniMax doesn't have a public CORS-friendly status endpoint; show key is set
+  if (valEl)   { valEl.textContent = '✓'; valEl.style.color = '#818cf8'; valEl.style.fontSize = '28px'; }
+  if (labelEl) { labelEl.textContent = 'Key stored'; labelEl.style.color = '#818cf8'; }
+}
+
+// Auto-refresh every 5 minutes
+let _creditsTimer = null;
+function startCreditsAutoRefresh() {
+  refreshCredits();
+  _creditsTimer = setInterval(refreshCredits, 5 * 60 * 1000);
+}
+
+// ════════════════════════════════════════════════════════
 //  INIT
 // ════════════════════════════════════════════════════════
 (async function init() {
   // Load home tab data
   await loadHomeLogs();
   await loadHomeStats();
+  // Credits widget
+  startCreditsAutoRefresh();
 })();
 </script>
 </body>
